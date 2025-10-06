@@ -111,7 +111,10 @@ function setupTrajectoryVideoSelector() {
         }
 
         video.pause();
-        source.src = videoPath;
+        if (source) {
+            source.src = videoPath;
+        }
+        video.setAttribute('src', videoPath);
         video.load();
 
         if (caption) {
@@ -129,6 +132,6 @@ function setupTrajectoryVideoSelector() {
     });
 }
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     setupTrajectoryVideoSelector();
 });
