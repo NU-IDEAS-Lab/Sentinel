@@ -487,38 +487,40 @@ and offering insights into their failure modes.
 </section>
 <!-- End plan level safety -->
 
-<!-- Video carousel -->
+<!-- Trajectory violations viewer -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
-      <h2 class="title is-3">Another Carousel</h2>
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-video1">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video1" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel1.mp4" type="video/mp4">
-          </video>
+      <h2 class="title is-3">Trajectory Safety Violations</h2>
+      <div class="trajectory-video-selector has-text-centered">
+        <label class="label is-medium" for="trajectory-video-select">Select a task to view the corresponding trajectory safety violation</label>
+        <div class="control is-flex is-justify-content-center">
+          <div class="select is-medium">
+            <select id="trajectory-video-select" aria-label="Select a trajectory safety violation example">
+              <option value="" selected disabled>Choose a task</option>
+              <option value="static/videos/bottle-door.mp4" data-caption="Bottle Door">Bottle Door</option>
+              <option value="static/videos/candle-toiletpaper.mp4" data-caption="Candle &amp; Toilet Paper">Candle &amp; Toilet Paper</option>
+              <option value="static/videos/fridge-pickup.mp4" data-caption="Fridge Pickup">Fridge Pickup</option>
+              <option value="static/videos/kettle-phone.mp4" data-caption="Kettle &amp; Phone">Kettle &amp; Phone</option>
+              <option value="static/videos/mug-cellphone-sink.mp4" data-caption="Mug &amp; Cellphone in Sink">Mug &amp; Cellphone in Sink</option>
+              <option value="static/videos/toilet-open-candle.mp4" data-caption="Toilet Open &amp; Candle">Toilet Open &amp; Candle</option>
+              <option value="static/videos/water_spill.mp4" data-caption="Water Spill">Water Spill</option>
+              <option value="static/videos/wateringcan-phone.mp4" data-caption="Watering Can &amp; Phone">Watering Can &amp; Phone</option>
+            </select>
+          </div>
         </div>
-        <div class="item item-video2">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video2" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel2.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-video3">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video3" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel3.mp4" type="video/mp4">
-          </video>
-        </div>
+      </div>
+      <div class="trajectory-video-player">
+        <video id="trajectory-video" class="is-hidden" controls muted loop preload="metadata" aria-describedby="trajectory-video-caption">
+          <source id="trajectory-video-source" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <p id="trajectory-video-caption" class="help has-text-centered">Pick a task above to load the trajectory safety violation example.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- End video carousel -->
+<!-- End trajectory violations viewer -->
 
 
 

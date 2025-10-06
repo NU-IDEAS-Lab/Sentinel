@@ -90,53 +90,45 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// Video carousel autoplay when in view
-function setupVideoCarouselAutoplay() {
-    const carouselVideos = document.querySelectorAll('.results-carousel video');
-    
-    if (carouselVideos.length === 0) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const video = entry.target;
-            if (entry.isIntersecting) {
-                // Video is in view, play it
-                video.play().catch(e => {
-                    // Autoplay failed, probably due to browser policy
-                    console.log('Autoplay prevented:', e);
-                });
-            } else {
-                // Video is out of view, pause it
-                video.pause();
-            }
-        });
-    }, {
-        threshold: 0.5 // Trigger when 50% of the video is visible
-    });
-    
-    carouselVideos.forEach(video => {
-        observer.observe(video);
+// Trajectory video selector
+function setupTrajectoryVideoSelector() {
+    const select = document.getElementById('trajectory-video-select');
+    const video = document.getElementById('trajectory-video');
+    const source = document.getElementById('trajectory-video-source');
+    const caption = document.getElementById('trajectory-video-caption');
+
+    if (!select || !video || !source) {
+        return;
+    }
+
+    select.addEventListener('change', () => {
+        const selectedOption = select.options[select.selectedIndex];
+        const videoPath = selectedOption.value;
+        const captionText = selectedOption.dataset.caption || selectedOption.textContent;
+
+        if (!videoPath) {
+            return;
+        }
+
+        video.pause();
+        source.src = videoPath;
+        video.load();
+
+        if (caption) {
+            caption.textContent = `Currently viewing: ${captionText}`;
+        }
+
+        video.classList.remove('is-hidden');
+
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay might be blocked; leave video ready for manual playback.
+            });
+        }
     });
 }
 
 $(document).ready(function() {
-    // Check for click events on the navbar burger icon
-
-    var options = {
-		slidesToScroll: 1,
-		slidesToShow: 1,
-		loop: true,
-		infinite: true,
-		autoplay: true,
-		autoplaySpeed: 5000,
-    }
-
-	// Initialize all div with carousel class
-    var carousels = bulmaCarousel.attach('.carousel', options);
-	
-    bulmaSlider.attach();
-    
-    // Setup video autoplay for carousel
-    setupVideoCarouselAutoplay();
-
-})
+    setupTrajectoryVideoSelector();
+});
