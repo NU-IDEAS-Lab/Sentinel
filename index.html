@@ -469,8 +469,9 @@ and offering insights into their failure modes.
            alt="Trajectory safety example"
            style="width: 100%; height: auto;">
           <p class="main-text">
-            Plan-level evaluation is important for determining whether such interpretations translate into safe planning. We evaluate LLM-generated high-level plan on a subset of VirtualHome tasks under three prompting strategies: (i) no explicit safety mention, (ii) natural-language safety guidance, and (iii) formal LTL safety prompts 
-          </p>
+At the trajectory level, safety evaluation requires reasoning over the full embodied execution process,
+where simulators, low-level controllers, and LLM-generated action plans all interact. This setting
+introduces several sources of complexity beyond plan-level analysis.          </p>
           <figure>
             <img src="static/images/traj-safety-results.png"
                  alt="Plan level safety evaluation results"
@@ -487,7 +488,7 @@ and offering insights into their failure modes.
 </section>
 <!-- End plan level safety -->
 
-<!-- Trajectory violations viewer -->
+<!-- Video carousel -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
@@ -498,14 +499,9 @@ and offering insights into their failure modes.
           <div class="select is-medium">
             <select id="trajectory-video-select" aria-label="Select a trajectory safety violation example">
               <option value="" selected disabled>Choose a task</option>
-              <option value="static/videos/bottle-door.mp4" data-caption="Bottle Door">Bottle Door</option>
-              <option value="static/videos/candle-toiletpaper.mp4" data-caption="Candle &amp; Toilet Paper">Candle &amp; Toilet Paper</option>
-              <option value="static/videos/fridge-pickup.mp4" data-caption="Fridge Pickup">Fridge Pickup</option>
-              <option value="static/videos/kettle-phone.mp4" data-caption="Kettle &amp; Phone">Kettle &amp; Phone</option>
-              <option value="static/videos/mug-cellphone-sink.mp4" data-caption="Mug &amp; Cellphone in Sink">Mug &amp; Cellphone in Sink</option>
-              <option value="static/videos/toilet-open-candle.mp4" data-caption="Toilet Open &amp; Candle">Toilet Open &amp; Candle</option>
-              <option value="static/videos/water_spill.mp4" data-caption="Water Spill">Water Spill</option>
-              <option value="static/videos/wateringcan-phone.mp4" data-caption="Watering Can &amp; Phone">Watering Can &amp; Phone</option>
+              <option value="static/videos/candle-toiletpaper.mp4" data-caption="Candle &amp; Toilet Paper">Pick_and_place_candle_cart-401</option>
+              <option value="static/videos/mug-cellphone-sink.mp4" data-caption="Mug &amp; Cellphone in Sink">Mug &amp; Pick_and_clean_then_place_mug_coffeemachine-30</option>
+              <option value="static/videos/water_spill.mp4" data-caption="Water Spill">Pick_and_place_wateringcan_dresser-224</option>
             </select>
           </div>
         </div>
@@ -520,27 +516,10 @@ and offering insights into their failure modes.
     </div>
   </div>
 </section>
-<!-- End trajectory violations viewer -->
+<!-- End video carousel -->
 
 
 
-
-
-
-<!-- Paper poster -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title">Poster</h2>
-
-      <!-- TODO: Replace with your poster PDF -->
-      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
-          </iframe>
-        
-      </div>
-    </div>
-  </section>
-<!--End paper poster -->
 
 
 
