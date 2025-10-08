@@ -186,23 +186,11 @@ class EvalLLM:
 
         # initialize to start position
         event = env.step(dict(traj_data['scene']['init_action']))
-        if inject_danger:
-            # Inject some danger by filling all fillable objects with coffee
-            metadata = event.metadata
-            for obj in metadata['objects']:
-                if obj["canFillWithLiquid"] and not obj["isFilledWithLiquid"]:
-                    fill_action = {
-                        "action": "FillObjectWithLiquid",
-                        "objectId": obj["objectId"],
-                        "fillLiquid": "coffee",
-                        "forceAction": True
-                    }
-                    env.step(fill_action)
 
         
 
         # print goal instr
-        print("Task: %s" % (traj_data['turk_annotations']['anns'][r_idx]['task_desc']))
+        print("Task: %s" % (traj_data['task_desc']))
 
         # setup task for reward
         env.set_task(traj_data, args, reward_type=reward_type)
@@ -266,9 +254,7 @@ class EvalLLM:
             self.setup_scene(env, traj_data, r_idx, args, reward_type=reward_type, inject_danger=inject_danger)
 
             # goal instruction
-            goal_instr = traj_data['turk_annotations']['anns'][r_idx]['task_desc']
-            if traj_data.get('task_desc', None):
-                goal_instr = traj_data['task_desc']  # use more detailed task_desc if available
+            goal_instr = traj_data['task_desc']  # use more detailed task_desc if available
 
             print(f"Task description: {goal_instr}")
 
@@ -401,9 +387,8 @@ class EvalLLM:
         Extract current scene information for LLM input
         Remove useless info to reduce token usage
         """
-        # metadata_keys(['objects', 'isSceneAtRest', 'agent', 'hand', 'fov', 'isStanding', 'cameraPosition', 'cameraOrthSize', 'thirdPartyCameras', 'collided', 'collidedObjects', 'inventoryObjects', 'sceneName', 'lastAction', 'errorCode', 'lastActionSuccess', 'screenWidth', 'screenHeight', 'agentId', 'colors', 'colorBounds', 'reachablePositions', 'flatSurfacesOnGrid', 'distances', 'normals', 'isOpenableGrid', 'segmentedObjectIds', 'objectIdsInBox', 'actionIntReturn', 'actionFloatReturn', 'actionStringsReturn', 'actionFloatsReturn', 'actionVector3sReturn', 'visibleRange', 'actionReturn', 'currentTime'])
         scene_info = metadata.copy()
-        useless_info = ['isSceneAtRest', 'fov', 'isStanding', 'cameraPosition', 'cameraOrthSize', 'thirdPartyCameras', 'collided', 'collidedObjects', 'sceneName', 'lastAction', 'errorCode', 'screenWidth', 'screenHeight', 'agentId', 'colors', 'colorBounds', 'reachablePositions', 'flatSurfacesOnGrid', 'normals', 'isOpenableGrid', 'segmentedObjectIds', 'actionIntReturn', 'actionFloatReturn', 'actionStringsReturn', 'actionFloatsReturn', 'actionVector3sReturn', 'visibleRange', 'actionReturn', 'currentTime']
+        useless_info = ['isSceneAtRest', 'fov', 'isStanding', 'cameraPosition', 'cameraOrthSize', 'thirdPartyCameras', 'sceneName', 'lastAction', 'errorCode', 'screenWidth', 'screenHeight', 'agentId', 'colors', 'colorBounds', 'reachablePositions', 'flatSurfacesOnGrid', 'normals', 'segmentedObjectIds', 'actionIntReturn', 'actionFloatReturn', 'actionStringsReturn', 'actionFloatsReturn', 'actionVector3sReturn', 'visibleRange', 'actionReturn']
         for key in useless_info:
             scene_info.pop(key, None)
         
