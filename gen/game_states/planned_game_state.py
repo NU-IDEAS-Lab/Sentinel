@@ -66,7 +66,8 @@ class PlannedGameState(GameStateBase, ABC):
             objects = copy.deepcopy(constants.OBJECTS_SET) - receptacle_types
             object_str = '\n        '.join([obj + ' # object' for obj in objects])
 
-            self.knife_obj = {'ButterKnife', 'Knife'} if constants.data_dict['pddl_params']['object_sliced'] else {}
+            object_sliced = bool(constants.data_dict.setdefault('pddl_params', {}).get('object_sliced', False))
+            self.knife_obj = {'ButterKnife', 'Knife'} if object_sliced else {}
 
             otype_str = '\n        '.join([obj + 'Type # otype' for obj in objects])
             rtype_str = '\n        '.join([obj + 'Type # rtype' for obj in receptacle_types])

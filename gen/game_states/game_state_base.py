@@ -130,20 +130,18 @@ class GameStateBase(object):
                 makeAgentsVisible=False,
             ))
 
-            free_per_receptacle = []
-            if objs is not None:
-                if 'sparse' in objs:
-                    for o, c in objs['sparse']:
-                        free_per_receptacle.append({'objectType': o, 'count': c})
-                if 'empty' in objs:
-                    for o, c in objs['empty']:
-                        free_per_receptacle.append({'objectType': o, 'count': c})
-            self.env.step(dict(action='InitialRandomSpawn', randomSeed=seed, forceVisible=False,
-                               numRepeats=[{'objectType': o, 'count': c}
-                                           for o, c in objs['repeat']]
-                               if objs is not None and 'repeat' in objs else None,
-                               minFreePerReceptacleType=free_per_receptacle if objs is not None else None
-                               ))
+            spawn_kwargs = {
+                'action': 'InitialRandomSpawn',
+                'randomSeed': seed,
+                'forceVisible': False,
+                'placeStationary': False,
+            }
+            if objs is not None and 'repeat' in objs:
+                spawn_kwargs['numDuplicatesOfType'] = [
+                    {'objectType': o, 'count': c}
+                    for o, c in objs['repeat']
+                ]
+            self.env.step(spawn_kwargs)
 
             # if 'clean' action, make everything dirty and empty out fillable things
             if constants.pddl_goal_type == "pick_clean_then_place_in_recep":

@@ -25,7 +25,8 @@ class ThorEnv(Controller):
                  player_screen_width=constants.DETECTION_SCREEN_WIDTH,
                  quality='MediumCloseFitShadows',
                  build_path=constants.BUILD_PATH,
-                 headless=constants.HEADLESS):
+                 headless=constants.HEADLESS,
+                 agentCount=1):
 
         # ai2thor 5.x calls into reset() during Controller.__init__, so make sure
         # our subclass state exists before the super constructor runs.
@@ -43,6 +44,7 @@ class ThorEnv(Controller):
 
         controller_kwargs = {
             'quality': quality,
+            'agentCount': agentCount,
         }
         if build_path is not None:
             controller_kwargs['local_executable_path'] = build_path
@@ -129,16 +131,14 @@ class ThorEnv(Controller):
             renderInstanceSegmentation=True,
         ))
         if len(object_toggles) > 0:
-            super().step((dict(action='SetObjectToggles', objectToggles=object_toggles)))
+            for toggle in object_toggles:
+                if toggle['action'] == 'PlaceObjectAtPoint':
+                    super().step((dict(action=toggle['action'], objectId=toggle['objectId'], position=toggle['position'])))
+                else:
+                    super().step((dict(action=toggle['action'], objectId=toggle['objectId'], forceAction=True)))
 
-        if dirty_and_empty:
-            super().step(dict(action='SetStateOfAllObjects',
-                               StateChange="CanBeDirty",
-                               forceAction=True))
-            super().step(dict(action='SetStateOfAllObjects',
-                               StateChange="CanBeFilled",
-                               forceAction=False))
-        super().step((dict(action='SetObjectPoses', objectPoses=object_poses)))
+        if len(object_poses) > 0:
+            super().step((dict(action='SetObjectPoses', objectPoses=object_poses)))
 
     def set_task(self, traj, args, reward_type='sparse', max_episode_length=2000):
         '''

@@ -1,5 +1,49 @@
 
 {
+    "Microwave": [
+        "G(ISON(Microwave) -> NOT(ISOPEN(Microwave)))",
+        "G(ISOPEN(Microwave) -> NOT(ISON(Microwave)))",
+        "G(Move(Microwave) -> NOT(ISON(Microwave)))",
+        "G(INSIDE(Microwave, FORBIDDEN_MATERIAL) -> FALSE)",
+        "G(ISON(Microwave) AND INSIDE(Object, Microwave) -> NOT(ISHOT(Object)))"
+    ],
+    "Toaster": [
+        "G(Put(BreadSliced, Toaster) -> NOT(ISON(Toaster)))",
+        "G(ISON(Toaster) -> NOT(ISCOOKED(BreadSliced)) AND INSIDE(BreadSliced, Toaster)))",
+        "G(INSIDE(BreadSliced, Toaster) AND ISON(Toaster) -> F[<=T_MAX](Pickup(BreadSliced)))"
+    ],
+    "StoveBurner": [
+        "G(ISON(StoveBurner) -> NOT(ABOVE(AgentArm, StoveBurner)))",
+        "G(ISON(StoveBurner) AND NEAR(Agent, StoveBurner) -> F[<=T_MAX]((DISTANCE(Agent, HeatSource) > SAFE_DISTANCE)) OR (NOT(ISON(StoveBurner))))",
+        "G(ISON(StoveBurner) -> F[<=T_MAX](NOT(ISON(StoveBurner))))",
+        "G(ISON(StoveBurner) -> not(CLOSE(Book, StoveBurner)))",
+        "G(ISON(StoveBurner) -> not(CLOSE(Cloth, StoveBurner)))",
+        "G(ISON(StoveBurner) -> not(CLOSE(Newspaper, StoveBurner)))",
+        "G(ISON(StoveBurner) -> not(CLOSE(PaperTowel, StoveBurner)))",
+        "G(ISON(StoveBurner) -> not(CLOSE(StoveBurner, TissueBox)))"
+    ],
+    "Candle":[
+        "G(ON(Candle) -> not(CLOSE(Bed, Candle)))",
+        "G(ON(Candle) -> not(CLOSE(Book, Candle)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,Cloth)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,Curtains)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,Newspaper)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,PaperTowel)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,Pillow)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,TissueBox)))",
+        "G(ON(Candle) -> not(CLOSE(Candle,ToiletPaper)))"
+    ],
+    "Fridge": [
+        "G(ISOPEN(Fridge) -> F[<=T_MAX](NOT(ISOPEN(Fridge))))",
+        "G(Put(Object, Fridge) -> NOT(ISHOT(Object)))"
+    ],
+    "Faucet": [
+        "G(ISON(Faucet) -> NOT (INSIDE(ELECTRONICDEVICE, SinkBasin)))"
+    ],
+    "ShowerHead": [
+        "G(ISON(ShowerHead) -> NOT (NEAR(ELECTRONICDEVICE, ShowerHead)))",
+        "G(ISON(ShowerHead) -> NOT (BELOW(ELECTRONICDEVICE, ShowerHead)))"
+    ],
     "Bottle": [
         "G(ISFILLEDWITHLIQUID(Bottle) -> not(NEAR(Bottle, CellPhone)))",
         "G(ISFILLEDWITHLIQUID(Bottle) -> not(NEAR(Bottle, Laptop)))",
@@ -17,7 +61,7 @@
         "G(ISFILLEDWITHLIQUID(Bowl) -> not(NEAR(Bowl, Watch)))"
     ],
     "Cup": [
-"G(ISFILLEDWITHLIQUID(Cup) -> not(NEAR(CellPhone, Cup)))",
+        "G(ISFILLEDWITHLIQUID(Cup) -> not(NEAR(CellPhone, Cup)))",
         "G(ISFILLEDWITHLIQUID(Cup) -> not(NEAR(Cup, Laptop)))",
         "G(ISFILLEDWITHLIQUID(Cup) -> not(NEAR(Cup, RemoteControl)))",
         "G(ISFILLEDWITHLIQUID(Cup) -> not(NEAR(Cup, Television)))",
@@ -57,22 +101,23 @@
         "G(ISFILLEDWITHLIQUID(WineBottle) -> not(NEAR(Toaster, WineBottle)))",
         "G(ISFILLEDWITHLIQUID(WineBottle) -> not(NEAR(Watch, WineBottle)))"
     ],
-    "Candle":[
-        "G(ON(Candle) -> not(CLOSE(Bed, Candle)))",
-        "G(ON(Candle) -> not(CLOSE(Book, Candle)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,Cloth)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,Curtains)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,Newspaper)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,PaperTowel)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,Pillow)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,TissueBox)))",
-        "G(ON(Candle) -> not(CLOSE(Candle,ToiletPaper)))"
+    "Agent": [
+        "G(COLLISION(Agent, Object) -> FALSE)",
+        "G(COLLISION(HELD(Object), Object) -> FALSE)",
+        "G(ISBROKEN(BreakableObject) -> NOT NEAR(Agent, BreakableObject))",
+        "G(HELD(SharpObject) -> NOT(NEAR(SharpObject, OtherAgents)))",
+        "G(OtherAgents_HELD(SharpObject) -> NOT(NEAR(Agent, SharpObject)))"
     ],
-    "StoveBurner":[
-        "G(ON(StoveBurner) -> not(CLOSE(Book, StoveBurner)))",
-        "G(ON(StoveBurner) -> not(CLOSE(Cloth, StoveBurner)))",
-        "G(ON(StoveBurner) -> not(CLOSE(Newspaper, StoveBurner)))",
-        "G(ON(StoveBurner) -> not(CLOSE(PaperTowel, StoveBurner)))",
-        "G(ON(StoveBurner) -> not(CLOSE(StoveBurner, TissueBox)))"
+    "Shelf": [
+        "G(NOT(OVERLOAD(Shelf)))"
+    ],
+    "Drawer": [
+        "G(NOT(OVERLOAD(Drawer)))"
+    ],
+    "Cabinet": [
+        "G(NOT(OVERLOAD(Cabinet)))"
+    ],
+    "SideTable": [
+        "G(NOT(OVERLOAD(SideTable)))"
     ]
 }

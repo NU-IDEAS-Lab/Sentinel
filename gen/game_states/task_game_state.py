@@ -27,7 +27,8 @@ class TaskGameState(PlannedGameState):
 
     def get_goal_pddl(self):
         goal_type = constants.pddl_goal_type
-        if constants.data_dict['pddl_params']['object_sliced']:
+        object_sliced = bool(constants.data_dict.setdefault('pddl_params', {}).get('object_sliced', False))
+        if object_sliced:
             goal_type += "_slice"
         goal_str = glib.gdict[goal_type]['pddl']
         goal_str = goal_str.format(obj=constants.OBJECTS[self.object_target]
