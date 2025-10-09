@@ -206,6 +206,7 @@ class EvalLLM:
         action_name = action_dict.get('action')
         object_id = action_dict.get('object_id', '')
         receptacle_id = action_dict.get('receptacle_id', '')
+        agent_id = action_dict.get('agentId')
         if action_name == "PutObject":
             if not receptacle_id:
                 raise ValueError("PutObject action requires a receptacle_id")
@@ -216,20 +217,16 @@ class EvalLLM:
         plan_action_copy = copy.deepcopy(action_dict)
         try:
             # Use the same direct execution approach as eval_llm_step.py
-            event, api_action = env.to_thor_api_exec(action_name, object_id, smooth_nav=smooth_nav)
+            event, api_action = env.to_thor_api_exec(
+                action_name,
+                object_id,
+                smooth_nav=smooth_nav,
+                agent_id=agent_id,
+            )
             success = event.metadata['lastActionSuccess']
             error = event.metadata.get('errorMessage', '') if not success else ''
             self.log(f"Action: {action_name}, Object ID: {object_id}, Success: {success}, Error: {error}")
 
-            # Because of the bug in AI2THOR 2.1.0, we cannot force_action for toggleon and need to manually toggle on objects
-            for obj in event.metadata['objects']:
-                if "Candle" in obj["objectType"] and obj["visible"] and not obj["isToggled"]:
-                    # Also light any unlit candles to create fire hazard
-                    light_action = {
-                        "action": "ToggleObjectOn",
-                        "objectId": obj["objectId"]
-                    }
-                    test = env.step(light_action)
             self._record_step(plan_action_copy, api_action, success, error, event)
             return success, event, error
         except Exception as e:

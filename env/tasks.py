@@ -37,6 +37,8 @@ class BaseTask(object):
 
         # prev state
         self.prev_state = self.env.last_event
+        if self.env.agent_count > 1:
+            self.prev_state = self.env.last_event.events[0]
 
     def load_reward_config(self, config_file):
         '''
@@ -117,6 +119,8 @@ class BaseTask(object):
 
         # save event
         self.prev_state = self.env.last_event
+        if self.env.agent_count > 1:
+            self.prev_state = self.env.last_event.events[0]
 
         # step and check if max_episode_length reached
         self.step_num += 1

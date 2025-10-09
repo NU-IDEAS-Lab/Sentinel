@@ -65,6 +65,26 @@ class ThorEnv(Controller):
             )
 
         print("ThorEnv started.")
+    
+    def get_last_event(self):
+        if self.agent_count > 1:
+            return self.last_event.events[0]
+        return self.last_event
+    
+    @staticmethod
+    def _unwrap_event(event, agent_index=0):
+        if event is None:
+            return None
+        events = getattr(event, 'events', None)
+        if isinstance(events, list) and events:
+            if agent_index < len(events):
+                return events[agent_index]
+            return events[0]
+        return event
+    def get_agent_event(self, agent_index=0):
+        """Return the per-agent Event corresponding to agent_index (defaults to 0)."""
+        return self._unwrap_event(getattr(self, 'last_event', None), agent_index=agent_index)
+
 
     def reset(self, scene_name_or_num,
               grid_size=constants.AGENT_STEP_SIZE / constants.RECORD_SMOOTHING_FACTOR,
@@ -138,7 +158,8 @@ class ThorEnv(Controller):
                 if toggle['action'] == 'PlaceObjectAtPoint':
                     super().step((dict(action=toggle['action'], objectId=toggle['objectId'], position=toggle['position'])))
                 else:
-                    super().step((dict(action=toggle['action'], objectId=toggle['objectId'], forceAction=True)))
+                    agent_id = toggle.get('agentId', 0)
+                    super().step((dict(action=toggle['action'], objectId=toggle['objectId'], forceAction=True, agentId=agent_id)))
 
         if len(object_poses) > 0:
             super().step((dict(action='SetObjectPoses', objectPoses=object_poses)))
@@ -192,7 +213,7 @@ class ThorEnv(Controller):
         extra updates to metadata after step
         '''
         # add 'cleaned' to all object that were washed in the sink
-        event = self.last_event
+        event = self.get_last_event()
         if event.metadata['lastActionSuccess']:
             # clean
             if action['action'] == 'ToggleObjectOn' and "Faucet" in action['objectId']:
@@ -216,19 +237,19 @@ class ThorEnv(Controller):
         if self.task is None:
             raise Exception("WARNING: no task setup for transition_reward")
         else:
-            return self.task.transition_reward(self.last_event)
+            return self.task.transition_reward(self.get_last_event())
 
     def get_goal_satisfied(self):
         if self.task is None:
             raise Exception("WARNING: no task setup for goal_satisfied")
         else:
-            return self.task.goal_satisfied(self.last_event)
+            return self.task.goal_satisfied(self.get_last_event())
 
     def get_goal_conditions_met(self):
         if self.task is None:
             raise Exception("WARNING: no task setup for goal_satisfied")
         else:
-            return self.task.goal_conditions_met(self.last_event)
+            return self.task.goal_conditions_met(self.get_last_event())
 
     def get_subgoal_idx(self):
         if self.task is None:
@@ -274,7 +295,7 @@ class ThorEnv(Controller):
         '''
         if render_settings is None:
             render_settings = DEFAULT_RENDER_SETTINGS
-        event = self.last_event
+        event = self.get_last_event()
         horizon = np.round(event.metadata['agent']['cameraHorizon'], 4)
         position = event.metadata['agent']['position']
         rotation = event.metadata['agent']['rotation']
@@ -304,7 +325,7 @@ class ThorEnv(Controller):
         '''
         if render_settings is None:
             render_settings = DEFAULT_RENDER_SETTINGS
-        event = self.last_event
+        event = self.get_last_event()
         start_horizon = event.metadata['agent']['cameraHorizon']
         rotation = np.round(event.metadata['agent']['rotation']['y'], 4)
         end_horizon = start_horizon + constants.AGENT_HORIZON_ADJ * (1 - 2 * int(action['action'] == 'LookUp'))
@@ -330,7 +351,7 @@ class ThorEnv(Controller):
         '''
         if render_settings is None:
             render_settings = DEFAULT_RENDER_SETTINGS
-        event = self.last_event
+        event = self.get_last_event()
         start_horizon = event.metadata['agent']['cameraHorizon']
         rotation = np.round(event.metadata['agent']['rotation']['y'], 4)
         end_horizon = start_horizon + angle
@@ -350,7 +371,7 @@ class ThorEnv(Controller):
         '''
         if render_settings is None:
             render_settings = DEFAULT_RENDER_SETTINGS
-        event = self.last_event
+        event = self.get_last_event()
         horizon = np.round(event.metadata['agent']['cameraHorizon'], 4)
         position = event.metadata['agent']['position']
         rotation = event.metadata['agent']['rotation']
@@ -389,7 +410,7 @@ class ThorEnv(Controller):
             if 'standing' not in action:
                 standing = True
                 if getattr(self, 'last_event', None) is not None:
-                    metadata = getattr(self.last_event, 'metadata', {}) or {}
+                    metadata = getattr(self.get_last_event(), 'metadata', {}) or {}
                     agent_meta = metadata.get('agent') or {}
                     standing = agent_meta.get('isStanding', standing)
                 action['standing'] = standing
@@ -406,70 +427,73 @@ class ThorEnv(Controller):
             'horizon': horizon,
         }
 
-    def to_thor_api_exec(self, action, object_id="", smooth_nav=False):
+    def to_thor_api_exec(self, action, object_id="", smooth_nav=False, agent_id=None):
         # TODO: parametrized navigation commands
 
+        def with_agent(action_dict):
+            if agent_id is not None and isinstance(action_dict, dict):
+                action_dict['agentId'] = agent_id
+            return action_dict
+
         if "RotateLeft" in action:
-            action = dict(action="RotateLeft",
-                          forceAction=True)
+            action = with_agent(dict(action="RotateLeft", forceAction=True))
             event = self.step(action, smooth_nav=smooth_nav)
         elif "RotateRight" in action:
-            action = dict(action="RotateRight",
-                          forceAction=True)
+            action = with_agent(dict(action="RotateRight", forceAction=True))
             event = self.step(action, smooth_nav=smooth_nav)
         elif "MoveAhead" in action:
-            action = dict(action="MoveAhead",
-                          forceAction=True)
+            action = with_agent(dict(action="MoveAhead", forceAction=True))
             event = self.step(action, smooth_nav=smooth_nav)
         elif "LookUp" in action:
-            action = dict(action="LookUp",
-                          forceAction=True)
+            action = with_agent(dict(action="LookUp", forceAction=True))
             event = self.step(action, smooth_nav=smooth_nav)
         elif "LookDown" in action:
-            action = dict(action="LookDown",
-                          forceAction=True)
+            action = with_agent(dict(action="LookDown", forceAction=True))
             event = self.step(action, smooth_nav=smooth_nav)
         elif "OpenObject" in action:
-            action = dict(action="OpenObject",
-                          objectId=object_id,
-                          moveMagnitude=1.0)
+            action = with_agent(
+                dict(action="OpenObject", objectId=object_id, moveMagnitude=1.0)
+            )
             event = self.step(action)
         elif "CloseObject" in action:
-            action = dict(action="CloseObject",
-                          objectId=object_id,
-                          forceAction=True)
+            action = with_agent(
+                dict(action="CloseObject", objectId=object_id, forceAction=True)
+            )
             event = self.step(action)
         elif "PickupObject" in action:
-            action = dict(action="PickupObject",
-                          objectId=object_id)
+            action = with_agent(dict(action="PickupObject", objectId=object_id))
             event = self.step(action)
         elif "PutObject" in action:
-            action = dict(action="PutObject",
-                          objectId=object_id,
-                          forceAction=True,
-                          placeStationary=True)
+            action = with_agent(
+                dict(
+                    action="PutObject",
+                    objectId=object_id,
+                    forceAction=True,
+                    placeStationary=True,
+                )
+            )
             event = self.step(action)
         elif "ToggleObjectOn" in action:
-            action = dict(action="ToggleObjectOn",
-                          objectId=object_id)
+            action = with_agent(dict(action="ToggleObjectOn", objectId=object_id))
             event = self.step(action)
-
         elif "ToggleObjectOff" in action:
-            action = dict(action="ToggleObjectOff",
-                          objectId=object_id)
+            action = with_agent(dict(action="ToggleObjectOff", objectId=object_id))
             event = self.step(action)
         elif "SliceObject" in action:
             # check if agent is holding knife in hand
-            inventory_objects = self.last_event.metadata['inventoryObjects']
+            current_event = self.get_agent_event()
+            inventory_objects = (
+                current_event.metadata['inventoryObjects'] if current_event else []
+            )
             if len(inventory_objects) == 0 or 'Knife' not in inventory_objects[0]['objectType']:
                 raise Exception("Agent should be holding a knife before slicing.")
 
-            action = dict(action="SliceObject",
-                          objectId=object_id)
+            action = with_agent(dict(action="SliceObject", objectId=object_id))
             event = self.step(action)
         else:
             raise Exception("Invalid action. Conversion to THOR API failed! (action='" + str(action) + "')")
 
+        event = self._unwrap_event(event)
         return event, action
 
     def check_clean(self, object_id):
@@ -478,7 +502,7 @@ class ThorEnv(Controller):
         In this case, we need to execute a `CleanAction` in the simulator on every object in the corresponding
         basin. This is to clean everything in the sink rather than just things touching the stream.
         '''
-        event = self.last_event
+        event = self.get_last_event()
         if event.metadata['lastActionSuccess'] and 'Faucet' in object_id:
             # Need to delay one frame to let `isDirty` update on stream-affected.
             event = self.step({'action': 'Pass'})
@@ -494,7 +518,7 @@ class ThorEnv(Controller):
         ignores any object that is not interactable in anyway
         '''
         pruned_instance_ids = []
-        for obj in self.last_event.metadata['objects']:
+        for obj in self.get_last_event().metadata['objects']:
             obj_id = obj['objectId']
             if obj_id in instances_ids:
                 if obj['pickupable'] or obj['receptacle'] or obj['openable'] or obj['toggleable'] or obj['sliceable']:
