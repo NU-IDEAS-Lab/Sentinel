@@ -68,7 +68,7 @@ class EvalLLM:
         os.makedirs('logs', exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         traj_path = args.traj_file.replace("data/json_2.1.0/", f"{args.llm_model}/").replace("/traj_data.json", "")
-        traj_log_file = os.path.join("logs", "trajectories", traj_path,f"r{args.ridx}_{timestamp}.json")
+        traj_log_file = os.path.join("logs", "trajectories", traj_path,f"{timestamp}.json")
         os.makedirs(os.path.dirname(traj_log_file), exist_ok=True)
         log_file = traj_log_file.replace(".json", ".txt")
         self.log_file = log_file
@@ -84,7 +84,7 @@ class EvalLLM:
             with open(self.log_file, 'a', encoding='utf-8') as f:
                 f.write(f"[{datetime.now().strftime('%H:%M:%S')}] {message}\n")
 
-    def test_single_trajectory(self, traj_file_path=None, goto=False, r_idx=0, inject_danger=False):
+    def test_single_trajectory(self, traj_file_path=None, goto=False):
         """
         Test evaluation on a single trajectory
         """
@@ -96,7 +96,10 @@ class EvalLLM:
             traj_data = json.load(f)
         
         # Create environment
-        env = ThorEnv()
+        if "multiagent" in traj_data and traj_data["multiagent"]:
+            env = ThorEnv(agentCount=traj_data["multiagent"]["agentCount"])
+        else:
+            env = ThorEnv()
         
         # Create simple objects (no multiprocessing needed for single test)
         successes = []
@@ -113,7 +116,7 @@ class EvalLLM:
             print(f"Testing single trajectory: {traj_file_path}")
             
             # Run evaluation on single trajectory
-            self.evaluate(env, r_idx, traj_data, self.args, lock, successes, failures, results, goto=goto, inject_danger=inject_danger)
+            self.evaluate(env, traj_data, self.args, lock, successes, failures, results, goto=goto)
 
         except Exception as e:
             print(f"Error during evaluation: {e}")
@@ -130,7 +133,7 @@ class EvalLLM:
         
         return successes, failures, results
 
-    def setup_scene(self, env, traj_data, r_idx, args, reward_type='dense', inject_danger=False):
+    def setup_scene(self, env, traj_data, args, reward_type='dense'):
         """
         Setup scene from trajectory data
         """
@@ -243,7 +246,7 @@ class EvalLLM:
         self._current_trace.record(plan_action, thor_action, success, error, metadata)
 
 
-    def evaluate(self, env, r_idx, traj_data, args, lock, successes, failures, results, goto=False, inject_danger=False):
+    def evaluate(self, env, traj_data, args, lock, successes, failures, results, goto=False):
         EvalLLM.log_method = self.log
         trace = EpisodeTrace()
         previous_trace = self._current_trace
@@ -251,7 +254,7 @@ class EvalLLM:
         try:
             # setup scene
             reward_type = 'dense'
-            self.setup_scene(env, traj_data, r_idx, args, reward_type=reward_type, inject_danger=inject_danger)
+            self.setup_scene(env, traj_data, args, reward_type=reward_type)
 
             # goal instruction
             goal_instr = traj_data['task_desc']  # use more detailed task_desc if available
@@ -335,7 +338,6 @@ class EvalLLM:
             lock.acquire()
             log_entry = {
                 'trial': traj_data['task_id'],
-                'repeat_idx': int(r_idx),
                 'goal_instr': goal_instr,
                 'completed_goal_conditions': int(pcs[0]),
                 'total_goal_conditions': int(pcs[1]),
@@ -454,7 +456,6 @@ if __name__ == "__main__":
     parser.add_argument('--split', type=str, default='valid_seen', help='Data split to evaluate')
     parser.add_argument('--data_dir', type=str, default='data/json_2.1.0', help='Data directory')
     parser.add_argument('--num_runs', type=int, default=5, help='Number of runs per trajectory')
-    parser.add_argument('ridx', type=int, default=0, nargs='?', help='Repeat index for single trajectory test')
     
 
     args = parser.parse_args()
@@ -463,4 +464,4 @@ if __name__ == "__main__":
     if args.batch:
         evaluator.test_batch(args.data_dir, args.split, args.num_runs)
     else:
-        evaluator.test_single_trajectory(args.traj_file, r_idx=args.ridx)
+        evaluator.test_single_trajectory(args.traj_file)
