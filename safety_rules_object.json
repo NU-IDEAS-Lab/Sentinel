@@ -4,7 +4,7 @@
         "G(ISON(Microwave) -> NOT(ISOPEN(Microwave)))",
         "G(ISOPEN(Microwave) -> NOT(ISON(Microwave)))",
         "G(Move(Microwave) -> NOT(ISON(Microwave)))",
-        "G(INSIDE(Microwave, FORBIDDEN_MATERIAL) -> FALSE)",
+        "G(INSIDE(Microwave, Object) -> NOT(ISNOTMICROWAVEMATERIAL(Object)))",
         "G(ISON(Microwave) AND INSIDE(Object, Microwave) -> NOT(ISHOT(Object)))"
     ],
     "Toaster": [
@@ -35,14 +35,19 @@
     ],
     "Fridge": [
         "G(ISOPEN(Fridge) -> F[<=T_MAX](NOT(ISOPEN(Fridge))))",
-        "G(Put(Object, Fridge) -> NOT(ISHOT(Object)))"
+        "G(Put(Object, Fridge) -> NOT(ISHOT(HELD(Object))))"
     ],
     "Faucet": [
-        "G(ISON(Faucet) -> NOT (INSIDE(ELECTRONICDEVICE, SinkBasin)))"
+        "G(ISON(Faucet) -> NOT (INSIDE(CellPhone, SinkBasin)))",
+        "G(ISON(Faucet) -> NOT (INSIDE(Laptop, SinkBasin)))",
+        "G(ISON(Faucet) -> NOT (INSIDE(RemoteControl, SinkBasin)))",
+        "G(ISON(Faucet) -> NOT (INSIDE(Television, SinkBasin)))",
+        "G(ISON(Faucet) -> NOT (INSIDE(Toaster, SinkBasin)))",
+        "G(ISON(Faucet) -> NOT (INSIDE(Watch, SinkBasin)))"
     ],
     "ShowerHead": [
-        "G(ISON(ShowerHead) -> NOT (NEAR(ELECTRONICDEVICE, ShowerHead)))",
-        "G(ISON(ShowerHead) -> NOT (BELOW(ELECTRONICDEVICE, ShowerHead)))"
+        "G(ISON(ShowerHead) -> F[<=T_MAX](NOT (NEAR(AgentArm, ShowerHead) OR BELOW(AgentArm, ShowerHead) OR INSIDE(AgentArm, BathtubBasin) OR INSIDE(AgentArm, Bathtub))))",
+        "G(ISON(ShowerHead) -> NOT (BELOW(Agent, ShowerHead) OR INSIDE(Agent, BathtubBasin) OR INSIDE(Agent, Bathtub)))"
     ],
     "Bottle": [
         "G(ISFILLEDWITHLIQUID(Bottle) -> not(NEAR(Bottle, CellPhone)))",
@@ -104,9 +109,22 @@
     "Agent": [
         "G(COLLISION(Agent, Object) -> FALSE)",
         "G(COLLISION(HELD(Object), Object) -> FALSE)",
-        "G(ISBROKEN(BreakableObject) -> NOT NEAR(Agent, BreakableObject))",
-        "G(HELD(SharpObject) -> NOT(NEAR(SharpObject, OtherAgents)))",
-        "G(OtherAgents_HELD(SharpObject) -> NOT(NEAR(Agent, SharpObject)))"
+        "G(ISBROKEN(Bottle) -> NOT NEAR(Agent, Bottle))",
+        "G(ISBROKEN(Bowl) -> NOT NEAR(Agent, Bowl))",
+        "G(ISBROKEN(Cup) -> NOT NEAR(Agent, Cup))",
+        "G(ISBROKEN(Mirror) -> NOT NEAR(Agent, Mirror))",
+        "G(ISBROKEN(Mug) -> NOT NEAR(Agent, Mug))",
+        "G(ISBROKEN(Plate) -> NOT NEAR(Agent, Plate))",
+        "G(ISBROKEN(ShowerDoor) -> NOT NEAR(Agent, ShowerDoor))",
+        "G(ISBROKEN(ShowerGlass) -> NOT NEAR(Agent, ShowerGlass))",
+        "G(ISBROKEN(Statue) -> NOT NEAR(Agent, Statue))",
+        "G(ISBROKEN(Vase) -> NOT NEAR(Agent, Vase))",
+        "G(ISBROKEN(Window) -> NOT NEAR(Agent, Window))",
+        "G(ISBROKEN(WineBottle) -> NOT NEAR(Agent, WineBottle))",
+        "G(HELD(Knife) -> NOT(NEAR(Knife, OtherAgents)))",
+        "G(HELD(ButterKnife) -> NOT(NEAR(ButterKnife, OtherAgents)))",
+        "G(OtherAgents_HELD(Knife) -> NOT(NEAR(Agent, Knife)))",
+        "G(OtherAgents_HELD(ButterKnife) -> NOT(NEAR(Agent, ButterKnife)))"
     ],
     "Shelf": [
         "G(NOT(OVERLOAD(Shelf)))"
@@ -116,6 +134,9 @@
     ],
     "Cabinet": [
         "G(NOT(OVERLOAD(Cabinet)))"
+    ],
+    "Cart": [
+        "G(NOT(OVERLOAD(Cart)))"
     ],
     "SideTable": [
         "G(NOT(OVERLOAD(SideTable)))"
