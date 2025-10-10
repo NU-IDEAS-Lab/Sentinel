@@ -26,13 +26,15 @@ class ThorEnv(Controller):
                  quality='MediumCloseFitShadows',
                  build_path=constants.BUILD_PATH,
                  headless=constants.HEADLESS,
-                 agentCount=1):
+                 agentCount=1,
+                 gridSize=constants.AGENT_STEP_SIZE / constants.RECORD_SMOOTHING_FACTOR):
 
         # ai2thor 5.x calls into reset() during Controller.__init__, so make sure
         # our subclass state exists before the super constructor runs.
         self.local_executable_path = build_path
         self.agent_count = agentCount
         self.task = None
+        self.default_grid_size = gridSize
 
         # internal states
         self.cleaned_objects = set()
@@ -46,6 +48,9 @@ class ThorEnv(Controller):
         controller_kwargs = {
             'quality': quality,
             'agentCount': agentCount,
+            'snapToGrid': True,
+            'continuousMode': False,
+            'gridSize': self.default_grid_size
         }
         if build_path is not None:
             controller_kwargs['local_executable_path'] = build_path
@@ -87,7 +92,7 @@ class ThorEnv(Controller):
 
 
     def reset(self, scene_name_or_num,
-              grid_size=constants.AGENT_STEP_SIZE / constants.RECORD_SMOOTHING_FACTOR,
+              grid_size=None,
               camera_y=constants.CAMERA_HEIGHT_OFFSET,
               render_image=constants.RENDER_IMAGE,
               render_depth_image=constants.RENDER_DEPTH_IMAGE,
@@ -98,6 +103,9 @@ class ThorEnv(Controller):
         reset scene and task states
         '''
         print("Resetting ThorEnv")
+
+        if grid_size is None:
+            grid_size = self.default_grid_size
 
         if type(scene_name_or_num) == str:
             scene_name = scene_name_or_num
@@ -142,7 +150,7 @@ class ThorEnv(Controller):
         '''
         super().step(dict(
             action='Initialize',
-            gridSize=constants.AGENT_STEP_SIZE / constants.RECORD_SMOOTHING_FACTOR,
+            gridSize=self.default_grid_size,
             cameraY=constants.CAMERA_HEIGHT_OFFSET,
             renderImage=constants.RENDER_IMAGE,
             renderDepthImage=constants.RENDER_DEPTH_IMAGE,
@@ -457,13 +465,14 @@ class ThorEnv(Controller):
             event = self.step(action)
         elif "CloseObject" in action:
             action = with_agent(
-                dict(action="CloseObject", objectId=object_id, forceAction=True)
+                dict(action="CloseObject", objectId=object_id, forceAction=False)
             )
             event = self.step(action)
         elif "PickupObject" in action:
-            action = with_agent(dict(action="PickupObject", objectId=object_id))
+            action = with_agent(dict(action="PickupObject", objectId=object_id, manualInteract=True))
             event = self.step(action)
         elif "PutObject" in action:
+            # This is True in order to let the agent place anything on receptacles without type constraints
             action = with_agent(
                 dict(
                     action="PutObject",
@@ -490,6 +499,14 @@ class ThorEnv(Controller):
 
             action = with_agent(dict(action="SliceObject", objectId=object_id))
             event = self.step(action)
+        elif 'Done' in action:
+            action = with_agent(dict(action="Done"))
+            event = self.step(action)
+        elif 'EmptyLiquidFromObject' in action:
+            action = with_agent(
+                dict(action="EmptyLiquidFromObject", objectId=object_id, forceAction=False)
+            )
+            event = self.step(action)
         else:
             raise Exception("Invalid action. Conversion to THOR API failed! (action='" + str(action) + "')")
 
@@ -512,20 +529,6 @@ class ThorEnv(Controller):
                         and game_util.get_object(in_sink_obj_id, event.metadata)['isDirty']):
                     event = self.step({'action': 'CleanObject', 'objectId': in_sink_obj_id})
         return event
-
-    def prune_by_any_interaction(self, instances_ids):
-        '''
-        ignores any object that is not interactable in anyway
-        '''
-        pruned_instance_ids = []
-        for obj in self.get_last_event().metadata['objects']:
-            obj_id = obj['objectId']
-            if obj_id in instances_ids:
-                if obj['pickupable'] or obj['receptacle'] or obj['openable'] or obj['toggleable'] or obj['sliceable']:
-                    pruned_instance_ids.append(obj_id)
-
-        ordered_instance_ids = [id for id in instances_ids if id in pruned_instance_ids]
-        return ordered_instance_ids
 
     @staticmethod
     def bbox_to_mask(bbox):
