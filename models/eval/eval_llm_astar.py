@@ -1,8 +1,7 @@
 import os
 import sys
 import math
-import numpy as np
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 # Add project root to Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -10,9 +9,17 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import gen.constants as constants
-from gen.graph.graph_obj import Graph
 from models.eval.eval_llm import EvalLLM
 from models.model.llm_astar import LLMAstar
+import numpy as np
+from nav_astar import (
+    astar_actions,
+    build_adjacency,
+    build_node_lookup,
+    jps_actions,
+    nearest_key,
+    normalize_yaw as snap_yaw,
+)
 
 
 class EvalLLMAstar(EvalLLM):
@@ -22,8 +29,6 @@ class EvalLLMAstar(EvalLLM):
         super().__init__(args, manager)
         self.llm_agent = LLMAstar(args)
         self.llm_agent.set_log_method(self.log)
-        self._graph: Optional[Graph] = None
-        self._graph_scene: Optional[int] = None
 
     def execute_action(self, env, action_dict, smooth_nav=False):  # type: ignore[override]
         action_name = action_dict.get('action')
@@ -35,59 +40,70 @@ class EvalLLMAstar(EvalLLM):
     # Navigation helpers
     # ------------------------------------------------------------------
     def _execute_goto(self, env, action: Dict, smooth_nav: bool):
-        metadata = env.last_event.metadata if env.last_event else {}
-        target_position = self.llm_agent.get_navigation_target(action, metadata)
+        target_object_id = action.get('object_id')
+        
+        reachable = env.step(action="GetReachablePositions")
+        reach_meta = reachable.metadata
+        if not reach_meta:
+            return False, env.last_event, 'No reachable positions found'
+        agent_meta = reach_meta['agent']
+        reachable_positions = reach_meta["actionReturn"]
+
+        event = env.step(
+            action="GetInteractablePoses",
+            objectId=target_object_id,
+            positions=reachable_positions, # will let default 4 rotations be used
+            horizons=[float(h) for h in np.linspace(-30, 60, 30)],
+            standings=[True],
+        )
+        poses = event.metadata["actionReturn"]
+        if not poses:
+            raise RuntimeError("No interactable poses returned for target object")
+        
+        # TODO: Pick multiple poses and choose one that works in the future
+        target_position = poses[0]
         if target_position is None:
             return False, env.last_event, 'GotoLocation missing valid target'
 
-        self._ensure_graph(env)
-        if self._graph is None:
-            return False, env.last_event, 'Navigation graph unavailable'
+        nodes = build_node_lookup(reachable_positions)
+        agent_position = agent_meta['position']
 
-        self._graph.update_map(env)
-        if env.last_event:
-            metadata = env.last_event.metadata or {}
-            reachable = metadata.get('reachablePositions')
-            if reachable is None:
-                reachable = metadata.get('actionReturn', [])
-        else:
-            reachable = []
-        nav_point = self._select_navigable_point(reachable, target_position)
-        if nav_point is None:
-            return False, env.last_event, 'No reachable navigation target'
+        start_key = nearest_key(nodes, agent_position)
+        target_key = nearest_key(nodes, target_position)
+        start_yaw = snap_yaw(agent_meta['rotation']['y'])
 
-        start_pose = self._get_agent_pose(env)
-        goal_pose = self._build_goal_pose(nav_point, target_position, start_pose[3])
+        try:
+            action_names = jps_actions(nodes, start_key, start_yaw, target_key)
+        except RuntimeError:
+            adjacency = build_adjacency(nodes)
+            action_names = astar_actions(nodes, adjacency, start_key, start_yaw, target_key)
 
-        max_iterations = 10
-        while max_iterations > 0:
-            try:
-                actions, path = self._graph.get_shortest_path(start_pose, goal_pose)
-            except Exception as exc:
-                event = env.last_event
-                return False, event, str(exc)
-            if not actions:
+        success = True
+        event = env.last_event
+        error = ''
+
+        for action_name in action_names:
+            success, event, error = self._dispatch_nav_action(env, {'action': action_name}, smooth_nav)
+            if not success:
                 break
 
-            segment_success = True
-            for index, primitive in enumerate(actions):
-                success, event, error = self._dispatch_nav_action(env, primitive, smooth_nav)
-                if not success:
-                    failure_pose = path[index + 1]
-                    self._graph.add_impossible_spot(failure_pose)
-                    start_pose = self._get_agent_pose(env)
-                    segment_success = False
-                    break
-            if segment_success:
-                start_pose = self._get_agent_pose(env)
-                if start_pose[:3] == goal_pose[:3]:
-                    break
-            max_iterations -= 1
+        if not success:
+            return success, event, error
 
-        final_pose = self._get_agent_pose(env)
-        success = final_pose[:2] == goal_pose[:2]
         event = env.last_event
-        target_object_id = action.get('object_id') if action else None
+
+        agent_meta = event.metadata['agent']
+        agent_position = agent_meta['position']
+        current_yaw = agent_meta['rotation']['y']
+
+        # the target pose already includes a desired yaw under rotation
+        desired_yaw = target_position['rotation']
+        for turn_name in self._turn_actions(current_yaw, desired_yaw):
+            success, event, error = super().execute_action(env, {'action': turn_name}, smooth_nav=smooth_nav)
+            if not success:
+                return success, event, error
+
+        event = env.last_event
         if success and event and target_object_id:
             visible = self._is_object_visible(event.metadata, target_object_id)
             if not visible:
@@ -98,73 +114,39 @@ class EvalLLMAstar(EvalLLM):
         return success, event, error
 
     def _dispatch_nav_action(self, env, primitive: Dict, smooth_nav: bool):
-        action_name = primitive.get('action')
+        if isinstance(primitive, str):
+            action_name = primitive
+            action_dict = {'action': action_name}
+        else:
+            action_name = primitive.get('action')
+            action_dict = {'action': action_name} if action_name else {}
         if not action_name:
             return False, env.last_event, 'Invalid navigation primitive'
-        action_dict = {'action': action_name}
-        if 'objectId' in primitive:
+        if isinstance(primitive, dict) and 'objectId' in primitive:
             action_dict['object_id'] = primitive['objectId']
         use_smooth = smooth_nav if smooth_nav is not None else getattr(self.args, 'smooth_nav', False)
         return super().execute_action(env, action_dict, smooth_nav=use_smooth)
 
-    def _ensure_graph(self, env):
-        event = env.last_event
-        if not event:
-            return
-        metadata = event.metadata or {}
-        scene_name = metadata.get('sceneName')
-        if not scene_name:
-            scene_name = getattr(env, 'scene', None)
-        if not scene_name:
-            return
-        try:
-            scene_id = int(''.join(filter(str.isdigit, scene_name)))
-        except ValueError:
-            return
-        if self._graph is None or self._graph_scene != scene_id:
-            self._graph = Graph(use_gt=True, construct_graph=True, scene_id=scene_id)
-            self._graph_scene = scene_id
-
-    def _select_navigable_point(self, reachable, target_position):
-        if not reachable:
-            return None
-        best = None
-        best_dist = float('inf')
-        for pos in reachable:
-            dx = pos['x'] - target_position['x']
-            dz = pos['z'] - target_position['z']
-            dist = dx * dx + dz * dz
-            if dist < best_dist:
-                best = pos
-                best_dist = dist
-        return best
-
-    def _build_goal_pose(self, nav_point, target_position, start_horizon):
-        grid_x = self._world_to_grid(nav_point['x'])
-        grid_z = self._world_to_grid(nav_point['z'])
-        rotation = self._estimate_goal_rotation(nav_point, target_position)
-        horizon = self._normalize_horizon(start_horizon)
-        return (grid_x, grid_z, rotation, horizon)
-
-    def _estimate_goal_rotation(self, nav_point, target_position):
-        dx = target_position['x'] - nav_point['x']
-        dz = target_position['z'] - nav_point['z']
-        if abs(dx) < 1e-3 and abs(dz) < 1e-3:
-            return 0
-        angle = (math.degrees(math.atan2(dx, dz)) + 360.0) % 360.0
-        return int(round(angle / 90.0)) % 4
-
-    def _get_agent_pose(self, env) -> Tuple[int, int, int, int]:
-        metadata = env.last_event.metadata if env.last_event else {}
-        agent_meta = metadata.get('agent', {})
-        position = agent_meta.get('position', {'x': 0.0, 'z': 0.0})
-        rotation_y = agent_meta.get('rotation', {}).get('y', 0.0)
-        horizon = agent_meta.get('cameraHorizon', 0.0)
-        grid_x = self._world_to_grid(position.get('x', 0.0))
-        grid_z = self._world_to_grid(position.get('z', 0.0))
-        rotation = int(round(rotation_y / 90.0)) % 4
-        norm_horizon = self._normalize_horizon(horizon)
-        return (grid_x, grid_z, rotation, norm_horizon)
+    @staticmethod
+    def _turn_actions(current_yaw: float, desired_yaw: Optional[float]):
+        if desired_yaw is None:
+            return []
+        current = snap_yaw(current_yaw)
+        desired = snap_yaw(desired_yaw)
+        diff = (desired - current) % 360
+        if diff == 0:
+            return []
+        if diff == 90:
+            return ['RotateRight']
+        if diff == 180:
+            return ['RotateRight', 'RotateRight']
+        if diff == 270:
+            return ['RotateLeft']
+        if diff < 180:
+            steps = int(round(diff / 90.0))
+            return ['RotateRight'] * steps
+        steps = int(round((360.0 - diff) / 90.0))
+        return ['RotateLeft'] * steps
 
     def _adjust_horizon_for_visibility(self, env, target_object_id: str, smooth_nav: bool) -> bool:
         event = env.last_event
@@ -212,16 +194,6 @@ class EvalLLMAstar(EvalLLM):
             if obj.get('objectId') == target_object_id:
                 return bool(obj.get('visible', False))
         return False
-
-    @staticmethod
-    def _normalize_horizon(horizon_value: float) -> int:
-        step = max(constants.AGENT_HORIZON_ADJ, 1)
-        return int(round(horizon_value / step)) * step
-
-    @staticmethod
-    def _world_to_grid(value: float) -> int:
-        return int(np.round(value / constants.AGENT_STEP_SIZE))
-
 
 if __name__ == "__main__":
     import argparse
