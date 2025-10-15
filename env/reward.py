@@ -21,6 +21,7 @@ class GotoLocationAction(BaseAction):
     MoveAhead, Rotate, Lookup
     '''
 
+    # TODO: Remove all ref to gr_graph if needed dense reward -> the tar_pose should also be acquired differently
     valid_actions = {'MoveAhead', 'RotateLeft', 'RotateRight', 'LookUp', 'LookDown', 'Teleport', 'TeleportFull'}
 
     def get_reward(self, state, prev_state, expert_plan, goal_idx):

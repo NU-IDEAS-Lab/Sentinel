@@ -26,10 +26,6 @@ class BaseTask(object):
         self.goal_idx = 0
         self.finished = -1
 
-        # load navigation graph
-        self.gt_graph = None
-        self.load_nav_graph()
-
         # reward config
         self.reward_config = None
         self.load_reward_config(args.reward_config)
