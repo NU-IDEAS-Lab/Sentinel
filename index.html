@@ -207,7 +207,7 @@
               <span class="author-block">
                 <a href="FOURTH AUTHOR PERSONAL LINK" target="_blank">Zinan Wang</a>,</span>
               <span class="author-block">
-                <a href="FIFTH AUTHOR PERSONAL LINK" target="_blank">Qineng Wang</a>,</span>
+                <a href="https://qinengwang-aiden.github.io/" target="_blank">Qineng Wang</a>,</span>
               <span class="author-block">
                 <a href="https://ariar1225.github.io/" target="_blank">Zhian Ruan</a>,</span>
               <span class="author-block">
@@ -376,11 +376,9 @@ and offering insights into their failure modes.
       <h2 class="title is-3">Plan Level Safety</h2>
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
-          <img src="static/images/sem-plan-pipeline.jpg"
-           alt="Semantic safety to Plan safety pipeline illustration"
-           style="width: 100%; height: auto;">
+          <embed src="static/images/figure2.pdf#toolbar=0" width="100%" height="170px" type="application/pdf">
           <p class="main-text">
-            Plan-level evaluation is important for determining whether such interpretations translate into safe planning. We evaluate LLM-generated high-level plan on a subset of VirtualHome tasks under three prompting strategies: (i) no explicit safety mention, (ii) natural-language safety guidance, and (iii) formal LTL safety prompts 
+            Plan-level evaluation is important for determining whether such interpretations translate into safe planning. We evaluate LLM-generated high-level plan on a subset of VirtualHome tasks under three prompting strategies: (i) no explicit safety mention, (ii) natural-language safety guidance, and (iii) formal LTL safety prompts. 
           </p>
           <figure>
             <img src="static/images/plan-safety-results.png"
@@ -405,15 +403,13 @@ and offering insights into their failure modes.
     <div class="container">
       <!-- Plan level safety illustration -->
       <h2 class="title is-3">Trajectory Level Safety</h2>
+      <embed src="static/images/wine-door-collision.pdf#toolbar=0" width="100%" height="545px" type="application/pdf">
+
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
-          <img src="static/images/traj-eg.jpg"
-           alt="Trajectory safety example"
-           style="width: 100%; height: auto;">
           <p class="main-text">
-At the trajectory level, safety evaluation requires reasoning over the full embodied execution process,
-where simulators, low-level controllers, and LLM-generated action plans all interact. This setting
-introduces several sources of complexity beyond plan-level analysis.          </p>
+At the trajectory level, safety evaluation requires reasoning over the full embodied execution process, where simulators, low-level controllers, and LLM-generated action plans all interact. This setting introduces several sources of complexity beyond plan-level analysis. As the examples shown in the above image, the interactions between these components can lead to unexpected safety violations  during execution that must be carefully analyzed and mitigated. 
+        </p>
           <figure>
             <img src="static/images/traj-safety-results.png"
                  alt="Plan level safety evaluation results"
