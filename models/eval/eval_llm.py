@@ -140,7 +140,6 @@ class EvalLLM:
         # scene setup
         scene_num = traj_data['scene']['scene_num']
         object_poses = traj_data['scene']['object_poses']
-        dirty_and_empty = traj_data['scene']['dirty_and_empty']
         object_toggles = traj_data['scene']['object_toggles']
 
         scene_name = 'FloorPlan%d' % scene_num
@@ -149,7 +148,7 @@ class EvalLLM:
         env.reset(scene_name)
         
         # setup initial conditions
-        env.restore_scene(object_poses, object_toggles, dirty_and_empty)
+        env.restore_scene(object_poses, object_toggles)
 
         restore_event = env.last_event
         restore_issues = []
@@ -310,9 +309,10 @@ class EvalLLM:
                     if fails >= args.max_fails:
                         print("Interact API failed %d times" % fails + "; latest error '%s'" % err)
                         break
-
-                t_reward, t_done = env.get_transition_reward()
-                reward += t_reward
+                
+                # TODO: Adapt the dense reward calculation if needed
+                # t_reward, t_done = env.get_transition_reward()
+                # reward += t_reward
                 t += 1
                 action_idx += 1
 

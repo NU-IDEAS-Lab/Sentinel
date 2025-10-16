@@ -144,7 +144,7 @@ class ThorEnv(Controller):
         self.cooled_objects = set()
         self.heated_objects = set()
 
-    def restore_scene(self, object_poses, object_toggles, dirty_and_empty):
+    def restore_scene(self, object_poses, object_toggles):
         '''
         restore object locations and states
         '''
