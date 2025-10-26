@@ -39,9 +39,10 @@ body {
 }
 
 .main-text {
-  /* Slightly tighter leading and explicit color for narrative paragraphs */
-  line-height: 1.4;
-  color: #000000;
+  color: #4a4a4a; /* match Bulma subtitle tone */
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.7;
   margin-top: 1.5rem;
   text-align: left;
 }
@@ -336,7 +337,7 @@ body {
 .content.has-text-justified {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: var(--text-secondary);
+  color: #303945; /* Slightly darker for better readability */
 }
 
 .content.has-text-justified p {

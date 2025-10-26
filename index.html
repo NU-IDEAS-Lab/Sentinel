@@ -266,34 +266,8 @@
 </section>
 
 
-<!-- Teaser Image-->
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <!-- TODO: Replace with your teaser visual -->
-      <img src="static/images/teaser.jpg"
-           alt="SENTINEL framework teaser image"
-           style="width: 100%; height: auto;">
-      <img src="static/images/framework_overview.jpg"
-           alt="SENTINEL framework overview illustration"
-           style="width: 100%; height: auto;">
-      <!-- TODO: Replace with your video description -->
-      <h2 class="subtitle has-text-centered">
-        Multi-level, progressive formal safety evaluation pipeline of SENTINEL. The process
-begins with semantic-level evaluation, where intuitive natural language safety requirements are
-interpreted into formal safety semantics. These interpretations then guide plan-level generation
-of high-level action plans by LLM agents, which are verified through LTL checking. Finally, at
-the trajectory-level, physical execution trajectories are generated based on the action plans and
-simulated, and verified through CTL checking. At every level, evaluation is automated and grounded
-in temporal-logic–based safety semantics.
-      </h2>
-    </div>
-  </div>
-</section>
-<!-- End teaser image -->
-
 <!-- Paper abstract -->
-<section class="section hero is-light">
+<section class="section hero">
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
@@ -327,6 +301,32 @@ and offering insights into their failure modes.
 <!-- End paper abstract -->
 
 
+<!-- Teaser Image-->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <!-- TODO: Replace with your teaser visual -->
+      <img src="static/images/teaser.jpg"
+           alt="SENTINEL framework teaser image"
+           style="width: 100%; height: auto;">
+      <img src="static/images/framework_overview.jpg"
+           alt="SENTINEL framework overview illustration"
+           style="width: 100%; height: auto;">
+      <!-- TODO: Replace with your video description -->
+      <h2 class="subtitle has-text-centered">
+        Multi-level, progressive formal safety evaluation pipeline of SENTINEL. The process
+begins with semantic-level evaluation, where intuitive natural language safety requirements are
+interpreted into formal safety semantics. These interpretations then guide plan-level generation
+of high-level action plans by LLM agents, which are verified through LTL checking. Finally, at
+the trajectory-level, physical execution trajectories are generated based on the action plans and
+simulated, and verified through CTL checking. At every level, evaluation is automated and grounded
+in temporal-logic–based safety semantics.
+      </h2>
+    </div>
+  </div>
+</section>
+<!-- End teaser image -->
+
 
 
 <!-- Semantic level safety -->
@@ -342,15 +342,212 @@ and offering insights into their failure modes.
             natural-language safety requirements into LTL-based formal semantics,
             providing the foundation for downstream action generation and evaluation.
           </p>
-          <figure>
-            <img src="static/images/sem-safety-results.png"
-                 alt="Semantic level safety evaluation results"
-                 style="width: 100%; height: auto;">
-            <!-- TODO: Optionally add a caption describing the semantic level safety results -->
-            <h2 class="subtitle has-text-centered">
-              Semantic-level safety evaluation results.
-            </h2>
+          <figure class="table-figure">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th rowspan="2">Model</th>
+                  <th class="sep-1">Gen&nbsp;Succ</th>
+                  <th class="sep-2" colspan="3">Overall Performance</th>
+                  <th class="sep-3" colspan="3">State Invariance</th>
+                  <th colspan="3">Ordering Constraints</th>
+                </tr>
+                <tr>
+                  <th class="sep-1">Succ</th>
+                  <th class="sep-2">Syntax&nbsp;Err</th>
+                  <th>Nonequiv</th>
+                  <th>Equiv</th>
+                  <th class="sep-3">Syntax&nbsp;Err</th>
+                  <th>Nonequiv</th>
+                  <th>Equiv</th>
+                  <th>Syntax&nbsp;Err</th>
+                  <th>Nonequiv</th>
+                  <th>Equiv</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="section">
+                  <th colspan="11"><em>Closed-Source LLMs</em></th>
+                </tr>
+                <tr>
+                  <th>GPT-5</th>
+                  <td class="sep-1">99.1</td>
+                  <td class="sep-2">0.0</td>
+                  <td>48.6</td>
+                  <td>51.4</td>
+                  <td class="sep-3">0.0</td>
+                  <td>63.4</td>
+                  <td>36.7</td>
+                  <td>0.0</td>
+                  <td>0.8</td>
+                  <td>99.3</td>
+                </tr>
+                <tr>
+                  <th>Claude Sonnet 4</th>
+                  <td class="sep-1">99.7</td>
+                  <td class="sep-2">0.1</td>
+                  <td>17.8</td>
+                  <td>82.1</td>
+                  <td class="sep-3">0.2</td>
+                  <td>25.5</td>
+                  <td>74.4</td>
+                  <td>0.0</td>
+                  <td>3.2</td>
+                  <td>96.8</td>
+                </tr>
+                <tr>
+                  <th>Gemini 2.5 Flash</th>
+                  <td class="sep-1">99.7</td>
+                  <td class="sep-2">2.0</td>
+                  <td>32.1</td>
+                  <td>66.0</td>
+                  <td class="sep-3">3.0</td>
+                  <td>46.8</td>
+                  <td>50.2</td>
+                  <td>0.0</td>
+                  <td>4.1</td>
+                  <td>95.9</td>
+                </tr>
+          
+                <tr class="section">
+                  <th colspan="11"><em>Open-Source LLMs</em></th>
+                </tr>
+                <tr>
+                  <th>DeepSeek V3.1</th>
+                  <td class="sep-1">93.3</td>
+                  <td class="sep-2">0.0</td>
+                  <td>15.6</td>
+                  <td>84.5</td>
+                  <td class="sep-3">0.0</td>
+                  <td>21.1</td>
+                  <td>78.9</td>
+                  <td>0.0</td>
+                  <td>5.1</td>
+                  <td>94.9</td>
+                </tr>
+                <tr>
+                  <th>Qwen3 14B</th>
+                  <td class="sep-1">95.9</td>
+                  <td class="sep-2">1.6</td>
+                  <td>70.7</td>
+                  <td>29.1</td>
+                  <td class="sep-3">0.2</td>
+                  <td>81.1</td>
+                  <td>18.7</td>
+                  <td>0.4</td>
+                  <td>24.9</td>
+                  <td>74.8</td>
+                </tr>
+                <tr>
+                  <th>Qwen3 8B</th>
+                  <td class="sep-1">0.0</td>
+                  <td class="sep-2">--</td>
+                  <td>--</td>
+                  <td>--</td>
+                  <td class="sep-3">--</td>
+                  <td>--</td>
+                  <td>--</td>
+                  <td>--</td>
+                  <td>--</td>
+                  <td>--</td>
+                </tr>
+                <tr>
+                  <th>Mistral 7B Instruct</th>
+                  <td class="sep-1">96.5</td>
+                  <td class="sep-2">11.7</td>
+                  <td>90.8</td>
+                  <td>0.1</td>
+                  <td class="sep-3">9.7</td>
+                  <td>90.3</td>
+                  <td>0.0</td>
+                  <td>4.1</td>
+                  <td>95.2</td>
+                  <td>0.7</td>
+                </tr>
+                <tr>
+                  <th>Llama 3.1-8B</th>
+                  <td class="sep-1">67.1</td>
+                  <td class="sep-2">17.3</td>
+                  <td>84.3</td>
+                  <td>1.2</td>
+                  <td class="sep-3">14.0</td>
+                  <td>86.9</td>
+                  <td>0.1</td>
+                  <td>15.1</td>
+                  <td>76.6</td>
+                  <td>8.2</td>
+                </tr>
+              </tbody>
+            </table>
           </figure>
+          
+          <style>
+          .table-figure { margin: 1rem 0; }
+          .table-figure > figcaption {
+            font: 600 0.98rem/1.3 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+            margin-bottom: .35rem;
+          }
+          
+          /* Booktabs-style table */
+          .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 2px solid #000;
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+            font-size: 0.95rem;
+          }
+          .tbl thead th {
+            text-align: left;
+            padding: 8px 10px;
+          }
+          .tbl thead tr:first-child th {
+            border-top: 2px solid #000; /* \toprule */
+            border-bottom: 0;
+            font-weight: 600;
+          }
+          .tbl thead tr:last-child th {
+            border-bottom: 2px solid #000;
+            font-weight: 400;
+          }
+          .tbl tbody th,
+          .tbl tbody td {
+            padding: 8px 10px;
+            vertical-align: top;
+          }
+          .tbl tbody tr + tr th,
+          .tbl tbody tr + tr td {
+            border-top: 1px solid #e0e0e0; /* row separators like \midrule */
+          }
+          .tbl--traj thead tr:first-child th {
+            border-bottom: 2px solid #000;
+          }
+          
+          /* Section header rows (e.g., Closed/Open-source) */
+          .tbl .section th {
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            text-align: center;
+            padding-top: 10px;
+            background: #fafafa;
+            font-weight: 600;
+          }
+          
+          /* Vertical rules to mimic l|c|ccc|cccccc */
+          .tbl th.sep-1, .tbl td.sep-1 { border-left: 2px solid #000; } /* between col 1 & 2 */
+          .tbl th.sep-2, .tbl td.sep-2 { border-left: 2px solid #000; } /* between col 2 & 3 */
+          .tbl th.sep-3, .tbl td.sep-3 { border-left: 2px solid #000; } /* between col 5 & 6 */
+          
+          /* Optional: zebra striping for readability (exclude section rows) */
+          .tbl tbody tr:not(.section):nth-child(odd) td,
+          .tbl tbody tr:not(.section):nth-child(odd) th {
+            background: #fcfcfc;
+          }
+          
+          </style>
+                      <h2 class="subtitle has-text-centered">
+                        Semantic-level safety evaluation results.
+                      </h2>
+          
         </div>
       </div>
     </div>
@@ -370,15 +567,137 @@ and offering insights into their failure modes.
           <p class="main-text">
             Plan-level evaluation is important for determining whether such interpretations translate into safe planning. We evaluate LLM-generated high-level plan on a subset of VirtualHome tasks under three prompting strategies: (i) no explicit safety mention, (ii) natural-language safety guidance, and (iii) formal LTL safety prompts. 
           </p>
-          <figure>
-            <img src="static/images/plan-safety-results.png"
-                 alt="Plan level safety evaluation results"
-                 style="width: 100%; height: auto;">
-            <!-- TODO: Optionally add a caption describing the plan level safety results -->
-            <h2 class="subtitle has-text-centered">
-              Plan-level safety evaluation results.
-            </h2>
+          <figure class="table-figure">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th rowspan="2">Model</th>
+                  <th class="sep-1" colspan="3">LTL Safety Prompt</th>
+                  <th class="sep-2" colspan="3">NL Safety Prompt</th>
+                  <th class="sep-3" colspan="3">No Safety Prompt</th>
+                </tr>
+                <tr>
+                  <th class="sep-1">Succ</th>
+                  <th>Safe</th>
+                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                  <th class="sep-2">Succ</th>
+                  <th>Safe</th>
+                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                  <th class="sep-3">Succ</th>
+                  <th>Safe</th>
+                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="section">
+                  <th colspan="10"><em>Closed-Source LLMs</em></th>
+                </tr>
+                <tr>
+                  <th>GPT-5</th>
+                  <td class="sep-1">68.2</td>
+                  <td>73.9</td>
+                  <td>67.7</td>
+                  <td class="sep-2">66.0</td>
+                  <td>71.8</td>
+                  <td>66.0</td>
+                  <td class="sep-3">62.4</td>
+                  <td>68.0</td>
+                  <td>62.3</td>
+                </tr>
+                <tr>
+                  <th>Claude Sonnet 4</th>
+                  <td class="sep-1">85.5</td>
+                  <td>91.2</td>
+                  <td>84.6</td>
+                  <td class="sep-2">84.6</td>
+                  <td>90.6</td>
+                  <td>83.7</td>
+                  <td class="sep-3">77.3</td>
+                  <td>82.2</td>
+                  <td>76.4</td>
+                </tr>
+                <tr>
+                  <th>Gemini 2.5 Flash</th>
+                  <td class="sep-1">87.1</td>
+                  <td>86.5</td>
+                  <td>76.3</td>
+                  <td class="sep-2">84.3</td>
+                  <td>84.3</td>
+                  <td>73.6</td>
+                  <td class="sep-3">83.4</td>
+                  <td>76.5</td>
+                  <td>72.6</td>
+                </tr>
+                <tr class="section">
+                  <th colspan="10"><em>Open-Source LLMs</em></th>
+                </tr>
+                <tr>
+                  <th>DeepSeek V3.1</th>
+                  <td class="sep-1">89.5</td>
+                  <td>96.5</td>
+                  <td>88.8</td>
+                  <td class="sep-2">88.9</td>
+                  <td>94.2</td>
+                  <td>84.1</td>
+                  <td class="sep-3">89.1</td>
+                  <td>83.4</td>
+                  <td>78.2</td>
+                </tr>
+                <tr>
+                  <th>Qwen3 14B</th>
+                  <td class="sep-1">34.2</td>
+                  <td>38.2</td>
+                  <td>34.1</td>
+                  <td class="sep-2">37.1</td>
+                  <td>40.9</td>
+                  <td>37.1</td>
+                  <td class="sep-3">32.2</td>
+                  <td>36.7</td>
+                  <td>32.2</td>
+                </tr>
+                <tr>
+                  <th>Qwen3 8B</th>
+                  <td class="sep-1">0.3</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td class="sep-2">0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td class="sep-3">0.2</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                </tr>
+                <tr>
+                  <th>Mistral 7B Instruct</th>
+                  <td class="sep-1">13.0</td>
+                  <td>3.9</td>
+                  <td>0.9</td>
+                  <td class="sep-2">13.7</td>
+                  <td>4.7</td>
+                  <td>1.2</td>
+                  <td class="sep-3">13.9</td>
+                  <td>4.1</td>
+                  <td>1.5</td>
+                </tr>
+                <tr>
+                  <th>Llama 3.1-8B</th>
+                  <td class="sep-1">16.5</td>
+                  <td>5.7</td>
+                  <td>1.3</td>
+                  <td class="sep-2">17.3</td>
+                  <td>5.8</td>
+                  <td>1.3</td>
+                  <td class="sep-3">17.2</td>
+                  <td>5.9</td>
+                  <td>1.0</td>
+                </tr>
+              </tbody>
+            </table>
           </figure>
+          <!-- TODO: Optionally add a caption describing the plan level safety results -->
+          <h2 class="subtitle has-text-centered">
+            Plan-level safety evaluation results.
+          </h2>
         </div>
       </div>
     </div>
@@ -393,22 +712,90 @@ and offering insights into their failure modes.
     <div class="container">
       <!-- Plan level safety illustration -->
       <h2 class="title is-3">Trajectory Level Safety</h2>
-      <embed src="static/images/wine-door-collision.pdf#toolbar=0" width="100%" height="545px" type="application/pdf">
-
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
           <p class="main-text">
-At the trajectory level, safety evaluation requires reasoning over the full embodied execution process, where simulators, low-level controllers, and LLM-generated action plans all interact. This setting introduces several sources of complexity beyond plan-level analysis. As the examples shown in the above image, the interactions between these components can lead to unexpected safety violations  during execution that must be carefully analyzed and mitigated. 
+At the trajectory level, safety evaluation requires reasoning over the full embodied execution process, where simulators, low-level controllers, and LLM-generated action plans all interact. This setting introduces several sources of complexity beyond plan-level analysis. As shown in the below example, the interactions between these components can lead to unexpected safety violations during execution that must be carefully analyzed and mitigated. 
         </p>
-          <figure>
-            <img src="static/images/traj-safety-results.png"
-                 alt="Plan level safety evaluation results"
-                 style="width: 100%; height: auto;">
-            <!-- TODO: Optionally add a caption describing the plan level safety results -->
-            <h2 class="subtitle has-text-centered">
-              Trajectory-level safety evaluation results.
-            </h2>
+        <embed src="static/images/wine-door-collision.pdf#toolbar=0" width="100%" height="545px" type="application/pdf">
+
+        <p class="main-text">
+          To empirically test the trajectory-level safety, we extend the evaluation to four LLMs that already demonstrate strong upstream planning ability. 
+          In order to incorporate more physically detailed safety constraints, we adapt a subset of tasks and scenes from the ALFRED dataset, emphasizing scenarios where physical interactions (e.g., handling liquids near electronics, operating appliances, object placement hazards) are directly safety-critical (see paper for more details). 
+                </p>
+          <figure class="table-figure">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th class="sep-1" colspan="4">LTL Safety Prompt</th>
+                  <th class="sep-2" colspan="4">No Safety Prompt</th>
+                </tr>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th class="sep-1">Valid</th>
+                  <th>Succ</th>
+                  <th>Safe</th>
+                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                  <th class="sep-2">Valid</th>
+                  <th>Succ</th>
+                  <th>Safe</th>
+                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>GPT-5</th>
+                  <td class="sep-1">87.9</td>
+                  <td>45.3</td>
+                  <td>10.3</td>
+                  <td>3.7</td>
+                  <td class="sep-2">88.4</td>
+                  <td>48.4</td>
+                  <td>7.5</td>
+                  <td>2.2</td>
+                </tr>
+                <tr>
+                  <th>Claude Sonnet 4</th>
+                  <td class="sep-1">92.5</td>
+                  <td>52.5</td>
+                  <td>5.7</td>
+                  <td>1.8</td>
+                  <td class="sep-2">92.7</td>
+                  <td>53.6</td>
+                  <td>5.9</td>
+                  <td>2.2</td>
+                </tr>
+                <tr>
+                  <th>Gemini 2.5 Flash</th>
+                  <td class="sep-1">88.4</td>
+                  <td>52.1</td>
+                  <td>6.2</td>
+                  <td>2.9</td>
+                  <td class="sep-2">85.1</td>
+                  <td>50.8</td>
+                  <td>5.1</td>
+                  <td>2.4</td>
+                </tr>
+                <tr>
+                  <th>DeepSeek V3.1</th>
+                  <td class="sep-1">92.3</td>
+                  <td>50.1</td>
+                  <td>15.4</td>
+                  <td>3.5</td>
+                  <td class="sep-2">90.3</td>
+                  <td>52.5</td>
+                  <td>6.8</td>
+                  <td>2.6</td>
+                </tr>
+              </tbody>
+            </table>
           </figure>
+          <!-- TODO: Optionally add a caption describing the plan level safety results -->
+          <h2 class="subtitle has-text-centered">
+            Trajectory-level safety evaluation results.
+          </h2>
+          
           <div class="trajectory-video-selector has-text-centered">
             <label class="label is-medium" for="trajectory-video-select">Select a task to view the corresponding trajectory safety violation</label>
             <div class="control is-flex is-justify-content-center">
