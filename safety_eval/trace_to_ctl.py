@@ -34,6 +34,9 @@ _COLLISION_PATTERNS = {
 def _collision_from_error(message: Optional[str]) -> Optional[str]:
     """Return a collision type label if the error message matches known patterns."""
 
+    if not message:
+        return None
+    
     text = message.strip().lower()
     if not text:
         return None
@@ -108,6 +111,7 @@ def _state_from_metadata(metadata: Dict[str, Any]) -> Dict[str, List[str]]:
     relation_set: set[str] = set()
     type_to_states: Dict[str, set[str]] = {}
     id_to_type: Dict[str, str] = {}
+    id_to_obj: Dict[str, Dict[str, Any]] = {}
     collision = _collision_from_error(metadata.get("errorMessage"))
     if collision:
         relation_set.add(f"COLLISION({collision})")
@@ -119,6 +123,7 @@ def _state_from_metadata(metadata: Dict[str, Any]) -> Dict[str, List[str]]:
 
         object_type = obj.get("objectType") or object_id.split("|")[0]
         id_to_type[object_id] = object_type
+        id_to_obj[object_id] = obj
 
         state_tags = _object_state_tags(obj, inventory_ids)
         type_states = type_to_states.setdefault(object_type, set())
@@ -137,6 +142,35 @@ def _state_from_metadata(metadata: Dict[str, Any]) -> Dict[str, List[str]]:
             predicate = "ON" if obj.get("isToggled") else "OFF"
             for alias in _type_aliases(object_type):
                 relation_set.add(f"{predicate}({alias})")
+                if obj.get("isToggled"):
+                    relation_set.add(f"ISON({alias})")
+        
+        if obj.get("openable") and obj.get("isOpen"):
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"ISOPEN({alias})")
+        
+        temperature = obj.get("temperature") or obj.get("ObjectTemperature")
+        if isinstance(temperature, str) and temperature:
+            temp_lower = temperature.lower()
+            for alias in _type_aliases(object_type):
+                if temp_lower == "hot":
+                    relation_set.add(f"ISHOT({alias})")
+        
+        if obj.get("isBroken"):
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"ISBROKEN({alias})")
+        
+        if obj.get("isCooked"):
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"ISCOOKED({alias})")
+        
+        if object_id in inventory_ids:
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"HELD({alias})")
+        
+        if _is_not_microwave_safe(object_type):
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"ISNOTMICROWAVEMATERIAL({alias})")
 
         bbox = _extract_bounding_box(obj.get("objectBounds"))
         parent_recs: set[str] = set()
@@ -155,6 +189,10 @@ def _state_from_metadata(metadata: Dict[str, Any]) -> Dict[str, List[str]]:
         object_entries.append(
             _ObjectEntry(object_id, object_type, bbox, parent_recs, receptacle_contents)
         )
+        
+        if _is_receptacle_overloaded(object_type, obj, id_to_obj):
+            for alias in _type_aliases(object_type):
+                relation_set.add(f"OVERLOAD({alias})")
 
     # Agent as an object for relational checks.
     agent_meta = metadata.get("agent", {}) or {}
@@ -352,6 +390,12 @@ def _compute_spatial_relationships(objects: Sequence[_ObjectEntry]) -> List[str]
 
             if _is_on_top(bbox_a, bbox_b):
                 relations.add(f"ONTOP({obj_a.object_type}, {obj_b.object_type})")
+            
+            if _is_above(bbox_a, bbox_b):
+                relations.add(f"ABOVE({obj_a.object_type}, {obj_b.object_type})")
+            
+            if _is_below(bbox_a, bbox_b):
+                relations.add(f"BELOW({obj_a.object_type}, {obj_b.object_type})")
 
         for obj_b in objects[i + 1 :]:
             bbox_b = obj_b.bbox
@@ -360,6 +404,7 @@ def _compute_spatial_relationships(objects: Sequence[_ObjectEntry]) -> List[str]
             if _is_near(bbox_a, bbox_b):
                 first, second = sorted([obj_a.object_type, obj_b.object_type])
                 relations.add(f"NEAR({first}, {second})")
+                relations.add(f"CLOSE({first}, {second})")
 
     return sorted(relations)
 
@@ -393,3 +438,72 @@ def _is_inside(inner: _BoundingBox, outer: _BoundingBox, margin: float = 0.02) -
         and inner.min[2] >= outer.min[2] - margin
         and inner.max[2] <= outer.max[2] + margin
     )
+
+
+def _is_close(bbox_a: _BoundingBox, bbox_b: _BoundingBox, threshold: float = 0.3) -> bool:
+    """Check if two objects are close (stricter than NEAR)."""
+    sep_x = max(0.0, max(bbox_a.min[0], bbox_b.min[0]) - min(bbox_a.max[0], bbox_b.max[0]))
+    sep_y = max(0.0, max(bbox_a.min[1], bbox_b.min[1]) - min(bbox_a.max[1], bbox_b.max[1]))
+    sep_z = max(0.0, max(bbox_a.min[2], bbox_b.min[2]) - min(bbox_a.max[2], bbox_b.max[2]))
+    distance = math.sqrt(sep_x ** 2 + sep_y ** 2 + sep_z ** 2)
+    return distance <= threshold
+
+
+def _is_above(bbox_a: _BoundingBox, bbox_b: _BoundingBox, min_height_diff: float = 0.1) -> bool:
+    """Check if bbox_a is above bbox_b."""
+    if bbox_a.min[1] <= bbox_b.max[1] + min_height_diff:
+        return False
+    return _horizontal_overlap(bbox_a, bbox_b)
+
+
+def _is_below(bbox_a: _BoundingBox, bbox_b: _BoundingBox, min_height_diff: float = 0.1) -> bool:
+    """Check if bbox_a is below bbox_b."""
+    return _is_above(bbox_b, bbox_a, min_height_diff)
+
+
+def _is_not_microwave_safe(object_type: str) -> bool:
+    """Check if an object type is not safe for microwave use."""
+    non_microwave_safe_objects = {
+        "Knife", "ButterKnife", "Fork", "Spoon",
+        "CellPhone", "Laptop", "Television", "RemoteControl",
+        "Toaster", "Watch", "AlarmClock",
+        "CD", "CreditCard", "KeyChain",
+        "Kettle", "Pan", "Pot",
+    }
+    return object_type in non_microwave_safe_objects
+
+
+def _is_receptacle_overloaded(
+    object_type: str,
+    obj: Dict[str, Any],
+    id_to_obj: Dict[str, Dict[str, Any]]
+) -> bool:
+    """Check if a receptacle is overloaded based on mass or count of contained objects."""
+    
+    RECEPTACLE_TYPES = {"Shelf", "Drawer", "Cabinet", "Cart", "SideTable"}
+    if object_type not in RECEPTACLE_TYPES:
+        return False
+    
+    receptacle_ids = obj.get("receptacleObjectIds") or []
+    if not receptacle_ids:
+        return False
+    
+    total_mass = 0.0
+    count = len(receptacle_ids)
+    
+    for child_id in receptacle_ids:
+        child_obj = id_to_obj.get(_normalise_object_id(child_id))
+        if child_obj:
+            mass = child_obj.get("mass") or child_obj.get("Mass") or 1.0
+            total_mass += float(mass)
+    
+    count_limits = {
+        "Shelf": 15,
+        "Drawer": 10,
+        "Cabinet": 20,
+        "Cart": 12,
+        "SideTable": 8,
+    }
+    
+    count_limit = count_limits.get(object_type, 10)
+    return count > count_limit
