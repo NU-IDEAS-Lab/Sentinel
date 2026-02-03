@@ -732,75 +732,80 @@ At the trajectory level, safety evaluation requires reasoning over the full embo
                 </p>
           <figure class="table-figure">
             <div style="overflow-x:auto;">
-            <table class="tbl">
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th class="sep-1" colspan="4">LTL Safety Prompt</th>
-                  <th class="sep-2" colspan="4">No Safety Prompt</th>
-                </tr>
-                <tr>
-                  <th>&nbsp;</th>
-                  <th class="sep-1">Valid</th>
-                  <th>Succ</th>
-                  <th>Safe</th>
-                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
-                  <th class="sep-2">Valid</th>
-                  <th>Succ</th>
-                  <th>Safe</th>
-                  <th>Succ&nbsp;&amp;&nbsp;Safe</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>GPT-5</th>
-                  <td class="sep-1">87.9</td>
-                  <td>45.3</td>
-                  <td>10.3</td>
-                  <td>3.7</td>
-                  <td class="sep-2">88.4</td>
-                  <td>48.4</td>
-                  <td>7.5</td>
-                  <td>2.2</td>
-                </tr>
-                <tr>
-                  <th>Claude Sonnet 4</th>
-                  <td class="sep-1">92.5</td>
-                  <td>52.5</td>
-                  <td>5.7</td>
-                  <td>1.8</td>
-                  <td class="sep-2">92.7</td>
-                  <td>53.6</td>
-                  <td>5.9</td>
-                  <td>2.2</td>
-                </tr>
-                <tr>
-                  <th>Gemini 2.5 Flash</th>
-                  <td class="sep-1">88.4</td>
-                  <td>52.1</td>
-                  <td>6.2</td>
-                  <td>2.9</td>
-                  <td class="sep-2">85.1</td>
-                  <td>50.8</td>
-                  <td>5.1</td>
-                  <td>2.4</td>
-                </tr>
-                <tr>
-                  <th>DeepSeek V3.1</th>
-                  <td class="sep-1">92.3</td>
-                  <td>50.1</td>
-                  <td>15.4</td>
-                  <td>3.5</td>
-                  <td class="sep-2">90.3</td>
-                  <td>52.5</td>
-                  <td>6.8</td>
-                  <td>2.6</td>
-                </tr>
-              </tbody>
-            </table>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th class="sep-1" colspan="3">Trajectory-level</th>
+                  </tr>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <th class="sep-1">Succ</th>
+                    <th>Safe</th>
+                    <th>Succ&nbsp;&amp;&nbsp;Safe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th colspan="4" class="group">LLMs</th>
+                  </tr>
+                  <tr>
+                    <th>GPT-5</th>
+                    <td class="sep-1">59.2</td>
+                    <td>53.6</td>
+                    <td>30.8</td>
+                  </tr>
+                  <tr>
+                    <th>Claude-Sonnet-4</th>
+                    <td class="sep-1">55.3</td>
+                    <td>26.9</td>
+                    <td>11.1</td>
+                  </tr>
+                  <tr>
+                    <th>Gemini-2.5-Flash</th>
+                    <td class="sep-1">58.0</td>
+                    <td>30.7</td>
+                    <td>15.2</td>
+                  </tr>
+                  <tr>
+                    <th>DeepSeek-V3.1</th>
+                    <td class="sep-1">54.7</td>
+                    <td>34.9</td>
+                    <td>15.0</td>
+                  </tr>
+          
+                  <tr>
+                    <th colspan="4" class="group">VLMs</th>
+                  </tr>
+                  <tr>
+                    <th>GPT-5</th>
+                    <td class="sep-1">54.8</td>
+                    <td>67.8</td>
+                    <td>42.8</td>
+                  </tr>
+                  <tr>
+                    <th>Gemini-2.5-Flash</th>
+                    <td class="sep-1">51.5</td>
+                    <td>55.1</td>
+                    <td>28.8</td>
+                  </tr>
+                  <tr>
+                    <th>GLM-4.6V</th>
+                    <td class="sep-1">43.6</td>
+                    <td>56.9</td>
+                    <td>28.6</td>
+                  </tr>
+                  <tr>
+                    <th>Gemma-3-27B-it</th>
+                    <td class="sep-1">30.5</td>
+                    <td>77.3</td>
+                    <td>15.6</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </figure>
-          <!-- TODO: Optionally add a caption describing the plan level safety results -->
+          
           <h2 class="subtitle has-text-centered">
             Trajectory-level safety evaluation results.
           </h2>
