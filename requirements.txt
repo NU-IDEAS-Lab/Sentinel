@@ -1,0 +1,12 @@
+numpy
+pandas
+opencv-python
+networkx
+h5py
+tqdm
+vocab
+revtok
+Pillow
+ai2thor
+flask==2.0.3
+Werkzeug==2.0.3

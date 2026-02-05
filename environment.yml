@@ -1,0 +1,39 @@
+# Conda environment for Safety Embodied Agent Benchmark
+name: safety-agent
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    # Core project dependencies
+    - lark
+    - bddl-eval
+    - pyquaternion
+    - pddlgym
+    - ipdb
+    - networkx>=3.1
+    - numpy>=1.20.0
+    - fire
+    - gdown
+    
+    # LLM API dependencies
+    - openai>=1.95.0
+    - httpx>=0.28.0,<1.0.0
+    - openrouter-py
+    
+    # Additional dependencies for wrapper
+    - pydantic>=1.9.0,<3.0.0
+    - python-dotenv>=0.19.0
+    - anyio>=3.5.0,<5.0.0
+    - distro>=1.7.0,<2.0.0
+    - jiter>=0.4.0,<1.0.0
+    - sniffio>=1.3.0
+    - tqdm>=4.65.0
+    - typing-extensions>=4.11.0,<5.0.0
+    - pyyaml>=6.0
+    - colorama>=0.4.6
+    
+    # Install the project itself in editable mode
+    - -e .

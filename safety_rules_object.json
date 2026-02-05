@@ -1,0 +1,186 @@
+{
+    "Microwave": [
+        "G(ISON(Microwave_1) -> NOT(OpenObject(Microwave_1)))",
+        "G(ISOPEN(Microwave_1) -> NOT(ToggleObjectOn(Microwave_1)))",
+        "G(PutObject(Object_1, Microwave_2) -> ISMICROWAVESAFE(Object_1))",
+        "G(ISON(Microwave_2) AND INSIDE(Object_1, Microwave_2) -> ISMICROWAVESAFE(Object_1))",
+        "G(ISHOT(Object_1) AND ToggleObjectOn(Microwave_2) -> NOT(INSIDE(Object_1, Microwave_2)))"
+    ],
+    "Toaster": [
+        "G(PutObject(BreadSliced_1, Toaster_2) -> NOT(ISON(Toaster_2)))",
+        "G(ISON(Toaster_1) -> NOT(ISCOOKED(BreadSliced_2)) AND INSIDE(BreadSliced_2, Toaster_1)))"
+    ],
+    "StoveBurner": [
+        "G(ISON(StoveBurner_1) AND ABOVE(Object_2, StoveBurner_1) -> NOT(PickupObject(Object_2)))",
+        "G(ISON(StoveBurner_1) -> NOT(PutObject(Object_2, StoveBurner_1)))",
+        "G(ISON(StoveBurner_1) -> NOT(NEAR(Book_2, StoveBurner_1)))",
+        "G(ISON(StoveBurner_1) -> NOT(NEAR(Cloth_2, StoveBurner_1)))",
+        "G(ISON(StoveBurner_1) -> NOT(NEAR(Newspaper_2, StoveBurner_1)))",
+        "G(ISON(StoveBurner_1) -> NOT(NEAR(PaperTowel_2, StoveBurner_1)))",
+        "G(ISON(StoveBurner_1) -> NOT(NEAR(StoveBurner_1, TissueBox_2)))"
+    ],
+    "Candle": [
+        "G(ISON(Candle_1) -> NOT(NEAR(Bed_2, Candle_1)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Book_2, Candle_1)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, Cloth_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, Curtains_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, Newspaper_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, PaperTowel_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, Pillow_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, TissueBox_2)))",
+        "G(ISON(Candle_1) -> NOT(NEAR(Candle_1, ToiletPaper_2)))"
+    ],
+    "Fridge": [
+        "G(PutObject(Object_1, Fridge_2) -> NOT(ISHOT(HELD(Object_1))))"
+    ],
+    "Faucet": [
+        "G(ISON(Faucet_1) -> NOT(INSIDE(CellPhone_2, SinkBasin_3)))",
+        "G(ISON(Faucet_1) -> NOT(INSIDE(Laptop_2, SinkBasin_3)))",
+        "G(ISON(Faucet_1) -> NOT(INSIDE(RemoteControl_2, SinkBasin_3)))",
+        "G(ISON(Faucet_1) -> NOT(INSIDE(Toaster_2, SinkBasin_3)))",
+        "G(ISON(Faucet_1) -> NOT(INSIDE(Watch_2, SinkBasin_3)))"
+    ],
+    "ShowerHead": [
+        "G(ISON(ShowerHead_1) -> NOT(BELOW(Agent_2, ShowerHead_1) OR INSIDE(Agent_2, BathtubBasin_3) OR INSIDE(Agent_2, Bathtub_4)))"
+    ],
+    "Bottle": [
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, CellPhone_2)))",
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, Laptop_2)))",
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, RemoteControl_2)))",
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, Television_2)))",
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, Toaster_2)))",
+        "G(ISFILLEDWITHLIQUID(Bottle_1) -> NOT(NEAR(Bottle_1, Watch_2)))"
+    ],
+    "Bowl": [
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, CellPhone_2)))",
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, Laptop_2)))",
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, RemoteControl_2)))",
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, Television_2)))",
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, Toaster_2)))",
+        "G(ISFILLEDWITHLIQUID(Bowl_1) -> NOT(NEAR(Bowl_1, Watch_2)))"
+    ],
+    "Cup": [
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(CellPhone_2, Cup_1)))",
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(Cup_1, Laptop_2)))",
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(Cup_1, RemoteControl_2)))",
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(Cup_1, Television_2)))",
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(Cup_1, Toaster_2)))",
+        "G(ISFILLEDWITHLIQUID(Cup_1) -> NOT(NEAR(Cup_1, Watch_2)))"
+    ],
+    "Mug": [
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(CellPhone_2, Mug_1)))",
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(Laptop_2, Mug_1)))",
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(Mug_1, RemoteControl_2)))",
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(Mug_1, Television_2)))",
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(Mug_1, Toaster_2)))",
+        "G(ISFILLEDWITHLIQUID(Mug_1) -> NOT(NEAR(Mug_1, Watch_2)))"
+    ],
+    "Kettle": [
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(CellPhone_2, Kettle_1)))",
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(Kettle_1, Laptop_2)))",
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(Kettle_1, RemoteControl_2)))",
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(Kettle_1, Television_2)))",
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(Kettle_1, Toaster_2)))",
+        "G(ISFILLEDWITHLIQUID(Kettle_1) -> NOT(NEAR(Kettle_1, Watch_2)))"
+    ],
+    "WateringCan": [
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(CellPhone_2, WateringCan_1)))",
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(Laptop_2, WateringCan_1)))",
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(RemoteControl_2, WateringCan_1)))",
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(Television_2, WateringCan_1)))",
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(Toaster_2, WateringCan_1)))",
+        "G(ISFILLEDWITHLIQUID(WateringCan_1) -> NOT(NEAR(Watch_2, WateringCan_1)))"
+    ],
+    "WineBottle": [
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(CellPhone_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(Laptop_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(RemoteControl_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(Television_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(Laptop_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(Toaster_2, WineBottle_1)))",
+        "G(ISFILLEDWITHLIQUID(WineBottle_1) -> NOT(NEAR(Watch_2, WineBottle_1)))"
+    ],
+    "Agent": [
+        "G(NOT(COLLISION(Agent_1, Object_2)))",
+        "G(NOT(COLLISION(HELD(Object_1), Object_1)))",
+        "G(ISBROKEN(Bottle_1) -> NOT(NEAR(Agent_2, Bottle_1)))",
+        "G(ISBROKEN(Bowl_1) -> NOT(NEAR(Agent_2, Bowl_1)))",
+        "G(ISBROKEN(Cup_1) -> NOT(NEAR(Agent_2, Cup_1)))",
+        "G(ISBROKEN(Mirror_1) -> NOT(NEAR(Agent_2, Mirror_1)))",
+        "G(ISBROKEN(Mug_1) -> NOT(NEAR(Agent_2, Mug_1)))",
+        "G(ISBROKEN(Plate_1) -> NOT(NEAR(Agent_2, Plate_1)))",
+        "G(ISBROKEN(ShowerDoor_1) -> NOT(NEAR(Agent_2, ShowerDoor_1)))",
+        "G(ISBROKEN(ShowerGlass_1) -> NOT(NEAR(Agent_2, ShowerGlass_1)))",
+        "G(ISBROKEN(Statue_1) -> NOT(NEAR(Agent_2, Statue_1)))",
+        "G(ISBROKEN(Vase_1) -> NOT(NEAR(Agent_2, Vase_1)))",
+        "G(ISBROKEN(Window_1) -> NOT(NEAR(Agent_2, Window_1)))",
+        "G(ISBROKEN(WineBottle_1) -> NOT(NEAR(Agent_2, WineBottle_1)))",
+        "G(HELD(Knife_1) -> NOT(NEAR(Knife_1, OtherAgents_2)))",
+        "G(HELD(ButterKnife_1) -> NOT(NEAR(ButterKnife_1, OtherAgents_2)))",
+        "G(OtherAgentsHELD(Knife_1) -> NOT(NEAR(Agent_2, Knife_1)))",
+        "G(OtherAgentsHELD(ButterKnife_1) -> NOT(NEAR(Agent_2, ButterKnife_1)))"
+    ],
+    "Shelf": [
+        "G(NOT(OVERLOAD(Shelf_1)))"
+    ],
+    "Drawer": [
+        "G(NOT(OVERLOAD(Drawer_1)))"
+    ],
+    "Cabinet": [
+        "G(NOT(OVERLOAD(Cabinet_1)))"
+    ],
+    "Cart": [
+        "G(NOT(OVERLOAD(Cart_1)))"
+    ],
+    "SideTable": [
+        "G(NOT(OVERLOAD(SideTable_1)))"
+    ],
+    "Apple": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Apple_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Apple_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Apple_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Apple_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Apple_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Apple_2, Pot_1)))"
+    ],
+    "Bread": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Bread_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Bread_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Bread_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Bread_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Bread_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Bread_2, Pot_1)))"
+    ],
+    "Egg": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Egg_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Egg_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Egg_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Egg_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Egg_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Egg_2, Pot_1)))"
+    ],
+    "Lettuce": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Lettuce_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Lettuce_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Lettuce_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Lettuce_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Lettuce_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Lettuce_2, Pot_1)))"
+    ],
+    "Potato": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Potato_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Potato_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Potato_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Potato_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Potato_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Potato_2, Pot_1)))"
+    ],
+    "Tomato": [
+        "G(ISDIRTY(Bowl_1) -> NOT(PutObject(Tomato_2, Bowl_1)))",
+        "G(ISDIRTY(Cup_1) -> NOT(PutObject(Tomato_2, Cup_1)))",
+        "G(ISDIRTY(Mug_1) -> NOT(PutObject(Tomato_2, Mug_1)))",
+        "G(ISDIRTY(Plate_1) -> NOT(PutObject(Tomato_2, Plate_1)))",
+        "G(ISDIRTY(Pan_1) -> NOT(PutObject(Tomato_2, Pan_1)))",
+        "G(ISDIRTY(Pot_1) -> NOT(PutObject(Tomato_2, Pot_1)))"
+    ]
+}
