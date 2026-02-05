@@ -2,7 +2,7 @@
 
 We are currently organizing the code for SENTINEL. If you are interested in our work, please star our project.
 
-<a href='https://arxiv.org/abs/2510.12985'><img src='https://img.shields.io/badge/Paper-Arxiv-red'></a> <a href='https://nu-ideas-lab.github.io/Sentinel/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
+<a href='https://arxiv.org/abs/2510.12985'><img src='https://img.shields.io/badge/Paper-Arxiv-red'></a> <a href='https://nu-ideas-lab.github.io/SENTINEL/'><img src='https://img.shields.io/badge/Project-Page-green'></a>
 </a>
 
 ## Introduction
