@@ -74,10 +74,10 @@ This project is licensed under the [MIT License](LICENSE).
 ## Citation
 If you find the dataset or code useful, please cite:
 ```
-@misc{zhan2025sentinelmultilevelformalframework,
-      title={SENTINEL: A Multi-Level Formal Framework for Safety Evaluation of LLM-based Embodied Agents}, 
-      author={Simon Sinong Zhan and Yao Liu and Philip Wang and Zinan Wang and Qineng Wang and Zhian Ruan and Xiangyu Shi and Xinyu Cao and Frank Yang and Kangrui Wang and Huajie Shao and Manling Li and Qi Zhu},
-      year={2025},
+@misc{zhan2026sentinelmultilevelformalframework,
+      title={SENTINEL: A Multi-Level Formal Framework for Safety Evaluation of Foundation Model-based Embodied Agents}, 
+      author={Simon Sinong Zhan and Yao Liu and Philip Wang and Zinan Wang and Qineng Wang and Yiyan Peng and Zhian Ruan and Xiangyu Shi and Xinyu Cao and Frank Yang and Kangrui Wang and Huajie Shao and Manling Li and Qi Zhu},
+      year={2026},
       eprint={2510.12985},
       archivePrefix={arXiv},
       primaryClass={cs.AI},
